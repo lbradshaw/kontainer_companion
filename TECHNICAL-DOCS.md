@@ -39,30 +39,28 @@ totetrax_mobile/
 ├── lib/
 │   ├── main.dart              # App entry point
 │   ├── models/                # Data models
-│   │   ├── tote.dart          # Tote data model
-│   │   └── settings.dart      # App settings model
+│   │   └── tote.dart          # Tote data model
 │   ├── screens/               # App screens
-│   │   ├── home_screen.dart
-│   │   ├── scanner_screen.dart
-│   │   ├── tote_detail_screen.dart
-│   │   └── settings_screen.dart
+│   │   ├── home_screen.dart       # Main tote list view
+│   │   ├── add_tote_screen.dart   # Add new tote form
+│   │   ├── tote_detail_screen.dart # View/edit tote details
+│   │   ├── scan_screen.dart        # QR code scanner (placeholder)
+│   │   └── settings_screen.dart    # Server configuration
 │   ├── services/              # Business logic
-│   │   ├── api_service.dart   # Backend API communication
-│   │   └── storage_service.dart # Local storage
+│   │   └── api_service.dart   # Backend API communication
 │   ├── utils/                 # Helpers
-│   │   ├── constants.dart
-│   │   └── theme.dart
-│   └── widgets/               # Reusable components
-│       ├── tote_card.dart
-│       └── image_gallery.dart
+│   │   └── theme.dart         # App theme matching ToteTrax web
+│   └── widgets/               # Reusable components (to be added)
 ├── android/                   # Android-specific code
 ├── ios/                       # iOS-specific code
 ├── web/                       # Web-specific code
 ├── windows/                   # Windows-specific code
 ├── linux/                     # Linux-specific code
 ├── macos/                     # macOS-specific code
+├── test/                      # Unit and widget tests
 ├── pubspec.yaml              # Dependencies
-└── README.md
+├── README.md
+└── TECHNICAL-DOCS.md         # This file
 ```
 
 ## Backend Integration
@@ -82,59 +80,125 @@ The mobile app communicates with the ToteTrax backend server:
 
 ```dart
 class Tote {
-  String id;
-  String name;
-  String qrCode;
-  List<String> images;  // Base64 encoded images stored in DB
-  List<Item> items;
-  DateTime createdAt;
-  DateTime updatedAt;
-}
-
-class Item {
-  String name;
-  int quantity;
+  final int id;
+  final String name;
+  final String items;       // Newline-separated item list
+  final String? qrCode;     // Base64 data URI for QR code image
+  
+  // Helper method to show first 3 lines of items
+  String getPreviewItems() {
+    List<String> lines = items.split('\n');
+    if (lines.length <= 3) return items;
+    return '${lines.take(3).join('\n')}...';
+  }
 }
 ```
 
-## Key Features Implementation
+**Note**: Images are stored in the database (not in model yet - future enhancement)
 
-### 1. QR Code Scanning
+## UI/UX Design
 
-Uses `mobile_scanner` package for cross-platform QR code scanning:
-- Camera permission handling
-- Auto-focus and torch control
-- QR code detection and parsing
-- Direct navigation to tote details
+### Theme & Colors
 
-### 2. Image Handling
+Matches ToteTrax web application design:
 
-- Multiple images per tote
-- Images stored as base64 in SQLite database
-- Image gallery view with thumbnails
-- Full-screen image viewing
-- Camera integration for adding photos
+**Light Mode:**
+- Background: `#F5F5F5`
+- Header: `#2C3E50` (dark blue-gray)
+- Text: `#333333`
+- Cards: `#FFFFFF`
+- Border: `#DDDDDD`
+- Primary: `#3498DB` (blue)
+- Success: `#2ECC71` (green)
+- Danger: `#E74C3C` (red)
+- Warning: `#F39C12` (orange)
 
-### 3. Server Configuration
+**Dark Mode:**
+- Background: `#1A1A1A`
+- Header: `#0D1117`
+- Text: `#E0E0E0`
+- Cards: `#2D2D2D`
+- Border: `#404040`
+- (Same accent colors as light mode)
 
-- Server URL stored in shared_preferences
-- Connection testing
-- Automatic retry with timeout handling
-- Error handling and user feedback
+### Screens
 
-### 4. State Management
+#### Home Screen
+- AppBar with "ToteTrax" title
+- Action buttons: Add New (+), Scan (QR), Settings
+- List of tote cards showing:
+  - Tote name (bold/large)
+  - First 3 lines of items
+- Pull-to-refresh functionality
+- Loading spinner when fetching data
+- Error state with retry button
+- Empty state message
 
-Uses Provider pattern:
-- `ToteProvider` - Manages tote data
-- `SettingsProvider` - Manages app settings
-- `ThemeProvider` - Manages dark/light mode
+#### Add Tote Screen
+- Form with:
+  - Tote Name text field (required)
+  - Items text area (10 lines, required)
+- Save button with loading state
+- Validation before submission
+- Back navigation on success
 
-### 5. Offline Support
+#### Tote Detail Screen
+- AppBar with delete button
+- Full tote information:
+  - Name (large heading)
+  - Complete items list
+  - QR code image (if available)
+- Delete confirmation dialog
+- Error handling
 
-- Local caching of tote data
-- Queue sync when connection restored
-- Optimistic UI updates
-- Conflict resolution
+#### Settings Screen
+- Server URL configuration
+- Save button with confirmation
+- (Future: theme toggle, other preferences)
+
+#### Scan Screen
+- Placeholder for QR scanner
+- "Coming Soon" message
+- Camera permission note
+
+## Current Implementation Status
+
+### ✅ Completed
+- Project scaffolding
+- Theme system matching ToteTrax web
+- Data models (Tote)
+- API service with full CRUD operations
+- Home screen with tote list
+- Add tote screen with form validation
+- Tote detail screen with delete
+- Settings screen (basic server URL)
+- Scan screen (placeholder)
+- Pull-to-refresh
+- Error handling and loading states
+- Navigation between screens
+- Responsive Material Design UI
+- Code analysis passing with no issues
+
+### 🚧 Planned/Future
+- QR code scanner implementation
+- Camera integration for images
+- Image upload and gallery
+- Server connectivity testing
+- Shared preferences for settings persistence
+- Offline support with local caching
+- Search and filter
+- Dark mode toggle in settings
+- Export/import data
+
+## Version History
+
+- **v0.1.0** (Feb 2026) - Initial implementation
+  - Flutter project created
+  - Theme matching ToteTrax web
+  - All CRUD screens implemented
+  - API integration complete
+  - Basic navigation and state management
+  - Code quality verified (flutter analyze passes)
 
 ## Platform-Specific Considerations
 
@@ -158,42 +222,29 @@ Uses Provider pattern:
 - Keyboard navigation support
 - Window management
 
-## Development Workflow
-
-### Running the App
+## Development Commands
 
 ```bash
-# Run on connected device/emulator
+# Get dependencies
+flutter pub get
+
+# Run code analysis
+flutter analyze
+
+# Run tests
+flutter test
+
+# Run app (debug mode)
 flutter run
 
-# Run on specific platform
-flutter run -d windows
-flutter run -d chrome
-flutter run -d android
+# Build for production
+flutter build apk --release      # Android APK
+flutter build appbundle --release # Android App Bundle
+flutter build windows --release   # Windows
+flutter build linux --release     # Linux
 ```
 
-### Building
-
-```bash
-# Android
-flutter build apk --release
-flutter build appbundle --release
-
-# iOS
-flutter build ios --release
-
-# Desktop
-flutter build windows --release
-flutter build linux --release
-flutter build macos --release
-```
-
-### Testing
-
-```bash
-flutter test
-flutter analyze
-```
+## Notes
 
 ## Configuration Files
 
@@ -228,12 +279,15 @@ This project uses the same technology stack and architecture as FilaTrax Mobile,
 
 ## Version History
 
-- **v0.1.0** - Initial project setup with Flutter structure
-  - Basic project scaffolding
-  - Dependencies configured
-  - Directory structure created
+- **v0.1.0** (Feb 2026) - Initial implementation
+  - Flutter project created
+  - Theme matching ToteTrax web
+  - All CRUD screens implemented
+  - API integration complete
+  - Basic navigation and state management
+  - Code quality verified (flutter analyze passes)
 
-## Notes
+## Development Commands
 
 - Follows Material Design guidelines
 - Supports both portrait and landscape orientations
