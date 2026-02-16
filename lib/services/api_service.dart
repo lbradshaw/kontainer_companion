@@ -1,13 +1,20 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/tote.dart';
 
 class ApiService {
   String baseUrl = 'http://localhost:3818';
 
+  Future<String> _getBaseUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('server_url') ?? 'http://localhost:3818';
+  }
+
   Future<List<Tote>> getTotes() async {
-    final response = await http.get(Uri.parse('$baseUrl/api/totes'));
+    final url = await _getBaseUrl();
+    final response = await http.get(Uri.parse('$url/api/totes'));
     
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
@@ -18,7 +25,8 @@ class ApiService {
   }
 
   Future<Tote> getTote(int id) async {
-    final response = await http.get(Uri.parse('$baseUrl/api/tote/$id'));
+    final url = await _getBaseUrl();
+    final response = await http.get(Uri.parse('$url/api/tote/$id'));
     
     if (response.statusCode == 200) {
       return Tote.fromJson(json.decode(response.body));
@@ -28,6 +36,7 @@ class ApiService {
   }
 
   Future<Tote> createTote(Tote tote) async {
+    final url = await _getBaseUrl();
     final Map<String, dynamic> body = {
       'name': tote.name,
       'items': tote.items,
@@ -39,7 +48,7 @@ class ApiService {
     
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/api/totes'),
+        Uri.parse('$url/api/totes'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(body),
       ).timeout(
@@ -60,6 +69,7 @@ class ApiService {
   }
 
   Future<void> updateTote(Tote tote) async {
+    final url = await _getBaseUrl();
     final Map<String, dynamic> body = {
       'name': tote.name,
       'items': tote.items,
@@ -67,7 +77,7 @@ class ApiService {
     
     try {
       final response = await http.put(
-        Uri.parse('$baseUrl/api/tote/${tote.id}'),
+        Uri.parse('$url/api/tote/${tote.id}'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(body),
       ).timeout(
@@ -86,10 +96,11 @@ class ApiService {
   }
   
   Future<void> addImagesToTote(int toteId, List<Uint8List> images) async {
+    final url = await _getBaseUrl();
     try {
       for (final imageData in images) {
         final response = await http.post(
-          Uri.parse('$baseUrl/api/tote/$toteId/add-image'),
+          Uri.parse('$url/api/tote/$toteId/add-image'),
           headers: {'Content-Type': 'application/json'},
           body: json.encode({
             'image_data': base64Encode(imageData),
@@ -111,9 +122,10 @@ class ApiService {
   }
 
   Future<void> deleteImage(int imageId) async {
+    final url = await _getBaseUrl();
     try {
       final response = await http.delete(
-        Uri.parse('$baseUrl/api/tote-image/$imageId'),
+        Uri.parse('$url/api/tote-image/$imageId'),
       ).timeout(
         const Duration(seconds: 10),
         onTimeout: () {
@@ -130,7 +142,8 @@ class ApiService {
   }
 
   Future<void> deleteTote(int id) async {
-    final response = await http.delete(Uri.parse('$baseUrl/api/tote/$id'));
+    final url = await _getBaseUrl();
+    final response = await http.delete(Uri.parse('$url/api/tote/$id'));
     
     if (response.statusCode != 200) {
       throw Exception('Failed to delete tote');
