@@ -27,6 +27,9 @@ dependencies:
   # State Management
   provider: ^6.1.0
 
+  # Image Picker
+  image_picker: ^1.0.4
+
   # NFC Support (Commented - Uncomment when ready)
   # nfc_manager: ^3.3.0
 

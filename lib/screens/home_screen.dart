@@ -27,6 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadTotes() async {
+    if (!mounted) return;
+    
     setState(() {
       _isLoading = true;
       _error = null;
@@ -34,11 +36,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final totes = await _apiService.getTotes();
+      if (!mounted) return;
       setState(() {
         _totes = totes;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _error = e.toString();
         _isLoading = false;
@@ -58,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () async {
               final result = await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AddToteScreen()),
+                MaterialPageRoute(builder: (context) => const ToteDetailScreen()),
               );
               if (result == true) {
                 _loadTotes();
@@ -135,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ToteDetailScreen(toteId: tote.id),
+                  builder: (context) => ToteDetailScreen(tote: tote),
                 ),
               );
               if (result == true) {

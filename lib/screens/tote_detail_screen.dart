@@ -1,83 +1,343 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/tote.dart';
 import '../services/api_service.dart';
 import '../utils/theme.dart';
 
 class ToteDetailScreen extends StatefulWidget {
-  final int toteId;
+  final Tote? tote;
 
-  const ToteDetailScreen({super.key, required this.toteId});
+  const ToteDetailScreen({Key? key, this.tote}) : super(key: key);
 
   @override
   State<ToteDetailScreen> createState() => _ToteDetailScreenState();
 }
 
 class _ToteDetailScreenState extends State<ToteDetailScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _itemsController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
   final ApiService _apiService = ApiService();
-  Tote? _tote;
-  bool _isLoading = true;
-  String? _error;
+  
+  List<Uint8List> _images = [];
+  List<int> _imageIds = []; // Track image IDs from backend
+  List<int> _deletedImageIds = []; // Track which images to delete
+  bool _isLoading = false;
+  bool _isEditing = false;
+  int _originalImageCount = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadTote();
+    if (widget.tote != null) {
+      _loadToteData();
+      _isEditing = true;
+    }
   }
 
-  Future<void> _loadTote() async {
+  Future<void> _loadToteData() async {
+    if (widget.tote == null) return;
+    
     setState(() {
       _isLoading = true;
-      _error = null;
     });
 
     try {
-      final tote = await _apiService.getTote(widget.toteId);
+      // Fetch fresh data from the server
+      final freshTote = await _apiService.getTote(widget.tote!.id);
+      
       setState(() {
-        _tote = tote;
-        _isLoading = false;
+        _nameController.text = freshTote.name;
+        _itemsController.text = freshTote.items;
+        _images = List.from(freshTote.images);
+        _imageIds = List.from(freshTote.imageIds);
+        _originalImageCount = freshTote.images.length;
+        _deletedImageIds.clear();
       });
     } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading tote: $e')),
+        );
+      }
+    } finally {
       setState(() {
-        _error = e.toString();
         _isLoading = false;
       });
     }
   }
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _itemsController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        final bytes = await image.readAsBytes();
+        setState(() {
+          _images.add(bytes);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error picking image: $e'),
+            backgroundColor: AppTheme.dangerColor,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _pickMultipleImages() async {
+    try {
+      final List<XFile> images = await _picker.pickMultiImage(
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 85,
+      );
+
+      for (var image in images) {
+        final bytes = await image.readAsBytes();
+        setState(() {
+          _images.add(bytes);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error picking images: $e'),
+            backgroundColor: AppTheme.dangerColor,
+          ),
+        );
+      }
+    }
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      // If this is an existing image (has an ID), track it for deletion
+      if (index < _imageIds.length && _imageIds[index] > 0) {
+        _deletedImageIds.add(_imageIds[index]);
+        _imageIds.removeAt(index);
+      }
+      _images.removeAt(index);
+    });
+  }
+
+  void _showImageOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.cardColor,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: AppTheme.accentColor),
+              title: const Text('Take Photo', style: TextStyle(color: AppTheme.textColor)),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: AppTheme.accentColor),
+              title: const Text('Choose from Gallery', style: TextStyle(color: AppTheme.textColor)),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: AppTheme.accentColor),
+              title: const Text('Choose Multiple', style: TextStyle(color: AppTheme.textColor)),
+              onTap: () {
+                Navigator.pop(context);
+                _pickMultipleImages();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showFullImage(Uint8List imageData) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Stack(
+          children: [
+            Center(
+              child: InteractiveViewer(
+                child: Image.memory(imageData),
+              ),
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _saveTote() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      if (_isEditing) {
+        // First, delete any removed images
+        if (_deletedImageIds.isNotEmpty) {
+          for (final imageId in _deletedImageIds) {
+            await _apiService.deleteImage(imageId);
+          }
+          _deletedImageIds.clear();
+        }
+        
+        // Update existing tote - only send name and items
+        final toteUpdate = Tote(
+          id: widget.tote!.id,
+          name: _nameController.text,
+          items: _itemsController.text,
+          qrCode: widget.tote!.qrCode,
+          images: [], // Don't send existing images in update
+        );
+        await _apiService.updateTote(toteUpdate);
+        
+        // Add new images separately (those not in original tote)
+        if (_images.length > _originalImageCount) {
+          final newImages = _images.sublist(_originalImageCount);
+          await _apiService.addImagesToTote(widget.tote!.id, newImages);
+        }
+        
+        // Reload tote data to get fresh state from server
+        final updatedTote = await _apiService.getTote(widget.tote!.id);
+        setState(() {
+          _images = updatedTote.images;
+          _originalImageCount = _images.length;
+        });
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Tote updated successfully')),
+          );
+        }
+      }else {
+        // Create new tote with all images
+        final tote = Tote(
+          id: 0,
+          name: _nameController.text,
+          items: _itemsController.text,
+          qrCode: '',
+          images: _images,
+        );
+        await _apiService.createTote(tote);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Tote created successfully')),
+          );
+        }
+      }
+
+      if (mounted) {
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error saving tote: $e'),
+            backgroundColor: AppTheme.dangerColor,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   Future<void> _deleteTote() async {
-    final confirm = await showDialog<bool>(
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Tote'),
-        content: const Text('Are you sure you want to delete this tote?'),
+        backgroundColor: AppTheme.cardColor,
+        title: const Text('Delete Tote', style: TextStyle(color: AppTheme.textColor)),
+        content: const Text(
+          'Are you sure you want to delete this tote?',
+          style: TextStyle(color: AppTheme.textSecondaryColor),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondaryColor)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppTheme.dangerColor),
-            child: const Text('Delete'),
+            child: const Text('Delete', style: TextStyle(color: AppTheme.dangerColor)),
           ),
         ],
       ),
     );
 
-    if (confirm == true) {
+    if (confirmed == true && widget.tote != null) {
+      setState(() {
+        _isLoading = true;
+      });
+
       try {
-        await _apiService.deleteTote(widget.toteId);
+        await _apiService.deleteTote(widget.tote!.id);
         if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Tote deleted successfully')),
+          );
           Navigator.pop(context, true);
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: ${e.toString()}'),
+              content: Text('Error deleting tote: $e'),
               backgroundColor: AppTheme.dangerColor,
             ),
           );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
         }
       }
     }
@@ -86,84 +346,193 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: const Text('Tote Details'),
+        backgroundColor: AppTheme.cardColor,
+        title: Text(_isEditing ? 'Edit Tote' : 'New Tote'),
         actions: [
-          if (_tote != null)
+          if (_isEditing)
             IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: _deleteTote,
+              icon: const Icon(Icons.delete, color: AppTheme.dangerColor),
+              onPressed: _isLoading ? null : _deleteTote,
             ),
         ],
       ),
-      body: _buildBody(),
-    );
-  }
-
-  Widget _buildBody() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 48, color: AppTheme.dangerColor),
-            const SizedBox(height: 16),
-            Text('Error: $_error'),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loadTote,
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (_tote == null) {
-      return const Center(child: Text('Tote not found'));
-    }
-
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Text(
-          _tote!.name,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 24),
-        ),
-        const SizedBox(height: 16),
-        const Text(
-          'Items:',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        const SizedBox(height: 8),
-        Text(_tote!.items),
-        const SizedBox(height: 24),
-        if (_tote!.qrCode != null) ...[
-          const Text(
-            'QR Code:',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          ),
-          const SizedBox(height: 8),
-          Center(
-            child: Container(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.accentColor))
+          : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Image.memory(
-                Uri.parse(_tote!.qrCode!).data!.contentAsBytes(),
-                width: 200,
-                height: 200,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextFormField(
+                      controller: _nameController,
+                      style: const TextStyle(color: AppTheme.textColor),
+                      decoration: InputDecoration(
+                        labelText: 'Tote Name',
+                        labelStyle: const TextStyle(color: AppTheme.accentColor),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: AppTheme.borderColor),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: AppTheme.accentColor),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: AppTheme.dangerColor),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: AppTheme.dangerColor),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a name';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _itemsController,
+                      style: const TextStyle(color: AppTheme.textColor),
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                        labelText: 'Items (one per line)',
+                        labelStyle: const TextStyle(color: AppTheme.accentColor),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: AppTheme.borderColor),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: AppTheme.accentColor),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: AppTheme.dangerColor),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: AppTheme.dangerColor),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Images',
+                          style: TextStyle(
+                            color: AppTheme.accentColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: _showImageOptions,
+                          icon: const Icon(Icons.add_photo_alternate),
+                          label: const Text('Add Images'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.accentColor,
+                            foregroundColor: AppTheme.backgroundColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    if (_images.isEmpty)
+                      Container(
+                        padding: const EdgeInsets.all(32),
+                        decoration: BoxDecoration(
+                          color: AppTheme.cardColor,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppTheme.borderColor),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'No images added',
+                            style: TextStyle(color: AppTheme.textSecondaryColor),
+                          ),
+                        ),
+                      )
+                    else
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                        ),
+                        itemCount: _images.length,
+                        itemBuilder: (context, index) {
+                          return Stack(
+                            children: [
+                              GestureDetector(
+                                onTap: () => _showFullImage(_images[index]),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: DecorationImage(
+                                      image: MemoryImage(_images[index]),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 4,
+                                right: 4,
+                                child: GestureDetector(
+                                  onTap: () => _removeImage(index),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: const BoxDecoration(
+                                      color: AppTheme.dangerColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.close,
+                                      size: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : _saveTote,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.accentColor,
+                        foregroundColor: AppTheme.backgroundColor,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        _isEditing ? 'Update Tote' : 'Create Tote',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      ],
     );
   }
 }

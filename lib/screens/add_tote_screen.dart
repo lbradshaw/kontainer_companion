@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/tote.dart';
 import '../services/api_service.dart';
 import '../utils/theme.dart';
 
@@ -34,8 +35,11 @@ class _AddToteScreenState extends State<AddToteScreen> {
 
     try {
       await _apiService.createTote(
-        _nameController.text,
-        _itemsController.text,
+        Tote(
+          id: 0,
+          name: _nameController.text,
+          items: _itemsController.text,
+        ),
       );
       
       if (mounted) {

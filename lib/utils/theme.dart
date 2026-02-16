@@ -22,6 +22,14 @@ class AppTheme {
   static const Color dangerColor = Color(0xFFE74C3C);
   static const Color successColor = Color(0xFF2ECC71);
   static const Color warningColor = Color(0xFFF39C12);
+  
+  // Convenience aliases
+  static const Color backgroundColor = darkBg;
+  static const Color cardColor = darkCardBg;
+  static const Color textColor = darkText;
+  static const Color textSecondaryColor = Color(0xFF999999);
+  static const Color borderColor = darkBorder;
+  static const Color accentColor = Color(0xFF00d4ff);
 
   static ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,

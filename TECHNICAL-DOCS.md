@@ -30,6 +30,7 @@ dependencies:
   http: ^1.1.0                # API communication
   shared_preferences: ^2.2.0  # Local settings storage
   provider: ^6.1.0            # State management
+  image_picker: ^1.0.4        # Camera and gallery access for images
 ```
 
 ## Project Structure
@@ -70,9 +71,11 @@ totetrax_mobile/
 The mobile app communicates with the ToteTrax backend server:
 
 - `GET /api/totes` - List all totes
-- `GET /api/totes/:id` - Get tote details
+- `GET /api/totes/:id` - Get tote details with images
 - `POST /api/totes` - Create new tote
-- `PUT /api/totes/:id` - Update tote
+- `PUT /api/totes/:id` - Update tote name and items
+- `POST /api/totes/:id/add-image` - Add image(s) to tote
+- `DELETE /api/totes/:id/image/:imageId` - Delete specific image from tote
 - `DELETE /api/totes/:id` - Delete tote
 - `GET /api/settings` - Get app settings
 
@@ -84,6 +87,7 @@ class Tote {
   final String name;
   final String items;       // Newline-separated item list
   final String? qrCode;     // Base64 data URI for QR code image
+  final List<ToteImage> images; // List of images stored in database
   
   // Helper method to show first 3 lines of items
   String getPreviewItems() {
@@ -92,9 +96,15 @@ class Tote {
     return '${lines.take(3).join('\n')}...';
   }
 }
+
+class ToteImage {
+  final int id;
+  final String data;  // Base64 encoded image data
+  bool markedForDeletion = false; // UI flag for deletion
+}
 ```
 
-**Note**: Images are stored in the database (not in model yet - future enhancement)
+**Note**: Images are stored in the database as Base64 encoded data
 
 ## UI/UX Design
 
@@ -144,10 +154,17 @@ Matches ToteTrax web application design:
 
 #### Tote Detail Screen
 - AppBar with delete button
-- Full tote information:
-  - Name (large heading)
-  - Complete items list
-  - QR code image (if available)
+- Editable form:
+  - Tote name text field
+  - Items text area (multiline)
+- Image management:
+  - Grid view of all tote images
+  - Add images from camera or gallery
+  - Delete images (tap to mark X, confirmed on save)
+  - View full-size images on tap
+- QR code display (if available)
+- Update button to save changes
+- Real-time refresh on screen load to sync with backend
 - Delete confirmation dialog
 - Error handling
 
@@ -166,32 +183,71 @@ Matches ToteTrax web application design:
 ### ✅ Completed
 - Project scaffolding
 - Theme system matching ToteTrax web
-- Data models (Tote)
-- API service with full CRUD operations
+- Data models (Tote, ToteImage)
+- API service with full CRUD operations including image management
 - Home screen with tote list
 - Add tote screen with form validation
-- Tote detail screen with delete
+- Tote detail/edit screen with:
+  - Name and items editing
+  - Image gallery with add/delete
+  - Camera and gallery integration
+  - Full-size image viewer
+  - Auto-refresh on load
+  - Delete tote functionality
 - Settings screen (basic server URL)
 - Scan screen (placeholder)
 - Pull-to-refresh
 - Error handling and loading states
 - Navigation between screens
 - Responsive Material Design UI
+- Image picker integration (camera + gallery)
+- Base64 image encoding/decoding
 - Code analysis passing with no issues
 
 ### 🚧 Planned/Future
-- QR code scanner implementation
-- Camera integration for images
-- Image upload and gallery
+- QR code scanner implementation with actual scanning
 - Server connectivity testing
 - Shared preferences for settings persistence
 - Offline support with local caching
-- Search and filter
+- Search and filter functionality
 - Dark mode toggle in settings
 - Export/import data
+- Image compression for large photos
+- Batch image operations
+- Image reordering
+
+## Key Features & Implementation Details
+
+### Image Management
+- **Storage**: Images stored as Base64 encoded data in SQLite database
+- **Upload**: Uses `image_picker` package for camera and gallery access
+- **Display**: Grid view with thumbnails, tap for full-screen view
+- **Deletion**: Mark for deletion with X overlay, confirmed on update
+- **Auto-refresh**: Tote details reload from server on screen navigation to sync changes
+
+### Update Workflow
+1. Load tote details from server (ensures latest data)
+2. User edits name, items, adds/removes images
+3. On save:
+   - Update tote name and items via PUT request
+   - Upload new images via POST to add-image endpoint
+   - Delete marked images via DELETE requests
+4. Refresh tote data after successful update
+
+### Data Synchronization
+- Mobile app fetches fresh data on screen load
+- Changes made via web UI are reflected immediately when details screen is opened
+- No local caching to avoid stale data issues
 
 ## Version History
 
+- **v0.2.0** (Feb 2026) - Image Management Update
+  - Added full image CRUD operations
+  - Camera and gallery integration
+  - Base64 image storage matching backend
+  - Auto-refresh on detail screen load
+  - Image deletion with visual feedback
+  
 - **v0.1.0** (Feb 2026) - Initial implementation
   - Flutter project created
   - Theme matching ToteTrax web
@@ -277,23 +333,16 @@ This project uses the same technology stack and architecture as FilaTrax Mobile,
 - Batch operations
 - Statistics and reports
 
-## Version History
-
-- **v0.1.0** (Feb 2026) - Initial implementation
-  - Flutter project created
-  - Theme matching ToteTrax web
-  - All CRUD screens implemented
-  - API integration complete
-  - Basic navigation and state management
-  - Code quality verified (flutter analyze passes)
-
-## Development Commands
+## Best Practices
 
 - Follows Material Design guidelines
 - Supports both portrait and landscape orientations
 - Implements accessibility features
 - Uses semantic versioning
 - Git repository initialized
+- Base64 encoding for cross-platform image compatibility
+- RESTful API design
+- Proper error handling and user feedback
 
 ## Related Documentation
 
