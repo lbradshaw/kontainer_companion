@@ -58,6 +58,11 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Kontainer'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh',
+            onPressed: _isLoading ? null : _loadTotes,
+          ),
+          IconButton(
             icon: const Icon(Icons.search),
             tooltip: 'Search',
             onPressed: () {
