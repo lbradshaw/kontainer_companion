@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../services/api_service.dart';
 import '../models/tote.dart';
-import 'tote_detail_screen.dart';
+import 'tote_view_screen.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -67,11 +67,11 @@ class _ScanScreenState extends State<ScanScreen> {
       if (!mounted) return;
       Navigator.of(context).pop();
 
-      // Navigate to tote detail screen
+      // Navigate to tote view screen
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => ToteDetailScreen(tote: tote),
+          builder: (context) => ToteViewScreen(tote: tote),
         ),
       );
     } catch (e) {

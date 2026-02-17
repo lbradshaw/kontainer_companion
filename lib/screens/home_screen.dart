@@ -5,6 +5,7 @@ import '../utils/theme.dart';
 import 'settings_screen.dart';
 import 'scan_screen.dart';
 import 'tote_detail_screen.dart';
+import 'tote_view_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -138,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ToteDetailScreen(tote: tote),
+                  builder: (context) => ToteViewScreen(tote: tote),
                 ),
               );
               if (result == true) {
