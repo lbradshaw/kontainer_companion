@@ -1,10 +1,10 @@
-# ToteTrax Mobile - Technical Documentation
+# Kontainer Mobile - Technical Documentation
 
 ## Project Information
 
-**Project Name**: ToteTrax Mobile  
+**Project Name**: Kontainer Mobile  
 **Technology Stack**: Flutter (Dart)  
-**Purpose**: Mobile companion app for ToteTrax storage tote inventory management  
+**Purpose**: Mobile companion app for Kontainer storage container inventory management  
 **Created**: February 2026  
 **Repository**: D:\projects\totetrax_mobile
 
@@ -40,18 +40,18 @@ totetrax_mobile/
 ├── lib/
 │   ├── main.dart              # App entry point
 │   ├── models/                # Data models
-│   │   └── tote.dart          # Tote data model
+│   │   └── tote.dart          # Kontainer data model
 │   ├── screens/               # App screens
-│   │   ├── home_screen.dart       # Main tote list view
-│   │   ├── add_tote_screen.dart   # Add new tote form (deprecated)
-│   │   ├── tote_view_screen.dart  # View tote details (read-only)
-│   │   ├── tote_detail_screen.dart # Edit tote (create/update)
+│   │   ├── home_screen.dart       # Main kontainer list view
+│   │   ├── add_tote_screen.dart   # Add new kontainer form (deprecated)
+│   │   ├── tote_view_screen.dart  # View kontainer details (read-only)
+│   │   ├── tote_detail_screen.dart # Edit kontainer (create/update)
 │   │   ├── scan_screen.dart        # QR code scanner
 │   │   └── settings_screen.dart    # Server configuration
 │   ├── services/              # Business logic
 │   │   └── api_service.dart   # Backend API communication
 │   ├── utils/                 # Helpers
-│   │   └── theme.dart         # App theme matching ToteTrax web
+│   │   └── theme.dart         # App theme matching Kontainer web
 │   └── widgets/               # Reusable components (to be added)
 ├── android/                   # Android-specific code
 ├── ios/                       # iOS-specific code
@@ -67,17 +67,17 @@ totetrax_mobile/
 
 ## Backend Integration
 
-### API Endpoints (ToteTrax Server)
+### API Endpoints (Kontainer Server)
 
-The mobile app communicates with the ToteTrax backend server:
+The mobile app communicates with the Kontainer backend server:
 
-- `GET /api/totes` - List all totes
-- `GET /api/totes/:id` - Get tote details with images
-- `POST /api/totes` - Create new tote
-- `PUT /api/totes/:id` - Update tote name and items
-- `POST /api/totes/:id/add-image` - Add image(s) to tote
-- `DELETE /api/totes/:id/image/:imageId` - Delete specific image from tote
-- `DELETE /api/totes/:id` - Delete tote
+- `GET /api/totes` - List all kontainers
+- `GET /api/totes/:id` - Get kontainer details with images
+- `POST /api/totes` - Create new kontainer
+- `PUT /api/totes/:id` - Update kontainer name and items
+- `POST /api/totes/:id/add-image` - Add image(s) to kontainer
+- `DELETE /api/totes/:id/image/:imageId` - Delete specific image from kontainer
+- `DELETE /api/totes/:id` - Delete kontainer
 - `GET /api/settings` - Get app settings
 
 ### Data Model
@@ -105,13 +105,13 @@ class ToteImage {
 }
 ```
 
-**Note**: Images are stored in the database as Base64 encoded data
+**Note**: Represents Kontainer instances; images are stored in the database as Base64 encoded data
 
 ## UI/UX Design
 
 ### Theme & Colors
 
-Matches ToteTrax web application design:
+Matches Kontainer web application design:
 
 **Light Mode:**
 - Background: `#F5F5F5`
@@ -135,22 +135,22 @@ Matches ToteTrax web application design:
 ### Screens
 
 #### Home Screen
-- AppBar with "ToteTrax" title
+- AppBar with "Kontainer" title
 - Action buttons: Add New (+), Scan (QR), Settings
-- List of tote cards showing:
-  - Tote name (bold/large)
+- List of kontainer cards showing:
+  - Kontainer name (bold/large)
   - First 3 lines of items
-- Tap card to view tote details
+- Tap card to view kontainer details
 - Pull-to-refresh functionality
 - Loading spinner when fetching data
 - Error state with retry button
 - Empty state message
 
-#### Tote View Screen (Read-Only)
-- View tote details without editing
+#### Kontainer View Screen (Read-Only)
+- View kontainer details without editing
 - AppBar with Edit and Delete buttons
 - Display sections:
-  - Tote name (large, bold)
+  - Kontainer name (large, bold)
   - Items list (full text)
   - QR code (if available)
   - Images grid (tap for full-size view)
@@ -158,13 +158,13 @@ Matches ToteTrax web application design:
 - Edit button navigates to edit screen
 - Delete button with confirmation dialog
 
-#### Tote Detail Screen (Create/Edit)
-- Form for creating new totes or editing existing ones
+#### Kontainer Detail Screen (Create/Edit)
+- Form for creating new kontainers or editing existing ones
 - Fields:
-  - Tote Name text field (required)
+  - Kontainer Name text field (required)
   - Items text area (multiline)
 - Image management:
-  - Grid view of all tote images
+  - Grid view of all kontainer images
   - Add images from camera or gallery
   - Delete images (tap X button)
   - View full-size images on tap
@@ -172,8 +172,8 @@ Matches ToteTrax web application design:
 - Validation before submission
 - Returns to previous screen on success
 
-#### Add Tote Screen (Deprecated)
-- Legacy screen, functionality moved to Tote Detail Screen
+#### Add Kontainer Screen (Deprecated)
+- Legacy screen, functionality moved to Kontainer Detail Screen
 - May be removed in future version
 
 #### Settings Screen
@@ -185,9 +185,9 @@ Matches ToteTrax web application design:
 - Full QR code scanner using mobile_scanner
 - Real-time camera view with overlay
 - Visual scanning frame with corner indicators
-- Automatic tote lookup by QR code
-- Navigation to tote detail on successful scan
-- Error dialog for totes not found
+- Automatic kontainer lookup by QR code
+- Navigation to kontainer detail on successful scan
+- Error dialog for kontainers not found
 - Flashlight toggle button
 - Camera switch button (front/back)
 - Works with printed QR codes (not reliable with screens)
@@ -196,25 +196,25 @@ Matches ToteTrax web application design:
 
 ### ✅ Completed
 - Project scaffolding
-- Theme system matching ToteTrax web
+- Theme system matching Kontainer web
 - Data models (Tote, ToteImage)
 - API service with full CRUD operations including image management
 - QR code lookup API endpoint (`getToteByQRCode`)
-- Home screen with tote list
-- Add tote screen with form validation
-- Tote detail/edit screen with:
+- Home screen with kontainer list
+- Add kontainer screen with form validation
+- Kontainer detail/edit screen with:
   - Name and items editing
   - Image gallery with add/delete
   - Camera and gallery integration
   - Full-size image viewer
   - Auto-refresh on load
-  - Delete tote functionality
+  - Delete kontainer functionality
 - Settings screen (basic server URL)
 - **QR code scanner (fully functional)**:
   - Real-time camera scanning
   - Visual overlay with scanning frame
-  - Automatic tote lookup and navigation
-  - Error handling for missing totes
+  - Automatic kontainer lookup and navigation
+  - Error handling for missing kontainers
   - Flashlight and camera switch controls
   - Works with printed QR codes
 - Camera permissions (Android + iOS)
@@ -228,7 +228,7 @@ Matches ToteTrax web application design:
 
 ### 🚧 Planned/Future
 - ~~Fix image upload (critical - images not saving to backend)~~ ✅ FIXED v0.4.0
-- ~~Fix delete tote error~~ ✅ FIXED v0.4.0
+- ~~Fix delete kontainer error~~ ✅ FIXED v0.4.0
 - Server connectivity testing
 - Shared preferences for settings persistence
 - Offline support with local caching
@@ -247,7 +247,7 @@ Matches ToteTrax web application design:
 - **Upload**: Uses `image_picker` package for camera and gallery access
 - **Display**: Grid view with thumbnails, tap for full-screen view
 - **Deletion**: Mark for deletion with X overlay, confirmed on update
-- **Auto-refresh**: Tote details reload from server on screen navigation to sync changes
+- **Auto-refresh**: Kontainer details reload from server on screen navigation to sync changes
 
 ### Update Workflow
 1. Load tote details from server (ensures latest data)
@@ -262,6 +262,7 @@ Matches ToteTrax web application design:
 - Mobile app fetches fresh data on screen load
 - Changes made via web UI are reflected immediately when details screen is opened
 - No local caching to avoid stale data issues
+- All kontainer updates are synchronized in real-time
 
 ## Version History
 
@@ -279,7 +280,7 @@ Matches ToteTrax web application design:
   - Better separation of concerns
 
 - **v0.4.1** (Feb 2026) - Gallery Image Update Fix
-  - **FIXED: Gallery image update bug** - RangeError when adding gallery images to existing totes
+  - **FIXED: Gallery image update bug** - RangeError when adding gallery images to existing kontainers
     - MIME types list only tracks new images, not existing ones from database
     - Fixed sublist calculation in tote_detail_screen.dart (line 244)
     - Gallery and camera images now work correctly for both create and update operations
@@ -290,7 +291,7 @@ Matches ToteTrax web application design:
     - Send images in data URI format: `data:image/jpeg;base64,{data}`
     - Send image_paths and image_types arrays to backend
     - Works for both create and add-image operations
-  - **FIXED: Delete tote bug** - Accept 204 No Content status code
+  - **FIXED: Delete kontainer bug** - Accept 204 No Content status code
   - **FIXED: Create endpoint** - Changed from /api/totes to /api/tote
   - All CRUD operations now working correctly
   - Images persist in database and display in web UI
@@ -298,10 +299,10 @@ Matches ToteTrax web application design:
 - **v0.3.0** (Feb 2026) - QR Scanner Implementation
   - Full QR code scanner using mobile_scanner package
   - Real-time barcode detection with visual overlay
-  - Automatic tote lookup by QR code (GET /api/tote/qr/{code})
+  - Automatic kontainer lookup by QR code (GET /api/tote/qr/{code})
   - Camera permissions configured (Android + iOS)
   - Flashlight and camera switching
-  - Error handling for totes not found
+  - Error handling for kontainers not found
   - Works reliably with printed QR codes
 
 - **v0.2.0** (Feb 2026) - Image Management Update
@@ -313,7 +314,7 @@ Matches ToteTrax web application design:
   
 - **v0.1.0** (Feb 2026) - Initial implementation
   - Flutter project created
-  - Theme matching ToteTrax web
+  - Theme matching Kontainer web
   - All CRUD screens implemented
   - API integration complete
   - Basic navigation and state management
@@ -331,7 +332,7 @@ Matches ToteTrax web application design:
 
 ### iOS
 - Camera usage description in Info.plist:
-  - `NSCameraUsageDescription`: "ToteTrax needs camera access to scan QR codes on storage totes"
+  - `NSCameraUsageDescription`: "Kontainer needs camera access to scan QR codes on storage containers"
 - Minimum iOS version: 12.0
 - Uses Cupertino design where appropriate
 - QR scanner fully functional
@@ -383,20 +384,20 @@ iOS-specific configuration, permissions, display names
 
 ## Similar to FilaTrax Mobile
 
-This project uses the same technology stack and architecture as FilaTrax Mobile, adapted for storage tote management instead of filament spools. Key differences:
+This project uses the same technology stack and architecture as FilaTrax Mobile, adapted for storage container management instead of filament spools. Key differences:
 
-- **Data Model**: Totes instead of Spools
-- **QR Codes**: Generated for storage totes instead of filament
+- **Data Model**: Kontainers instead of Spools
+- **QR Codes**: Generated for storage containers instead of filament
 - **Items List**: Text-based item inventory instead of filament properties
-- **Images**: Multiple images per tote showing contents
+- **Images**: Multiple images per kontainer showing contents
 
 ## Future Enhancements
 
-- NFC support for tote tagging
+- NFC support for kontainer tagging
 - Barcode scanning for items
 - Export/import functionality
 - Multi-user support
-- Location tracking for totes
+- Location tracking for kontainers
 - Search and filter capabilities
 - Batch operations
 - Statistics and reports
@@ -414,5 +415,5 @@ This project uses the same technology stack and architecture as FilaTrax Mobile,
 
 ## Related Documentation
 
-- See ToteTrax backend: `D:\projects\totetrax\TECHNICAL-DOCS.md`
+- See Kontainer backend: `D:\projects\totetrax\TECHNICAL-DOCS.md`
 - See FilaTrax Mobile: `D:\projects\filatrax_mobile\filatrax-mobile-info.md`

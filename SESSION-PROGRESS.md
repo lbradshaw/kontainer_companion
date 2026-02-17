@@ -1,16 +1,16 @@
-# ToteTrax Mobile - Current Session Progress & Known Issues
+# Kontainer Mobile - Current Session Progress & Known Issues
 
 **Last Updated**: 2026-02-17 20:39 UTC  
-**Session Context**: Development of ToteTrax Mobile companion app
+**Session Context**: Development of Kontainer Mobile companion app
 **Current Version**: v0.5.0
 
 ## Project Overview
 
-ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage container inventory management system. It connects to the ToteTrax Go backend server to provide mobile access to tote inventory.
+Kontainer Mobile is a Flutter-based mobile companion app for the Kontainer storage container inventory management system. It connects to the Kontainer Go backend server to provide mobile access to container inventory.
 
 **Related Projects:**
 - Backend: `D:\projects\totetrax` (Go + SQLite server)
-- Mobile: `D:\projects\totetrax_mobile` (Flutter app - this project)
+- Mobile: `D:\projects\totetrax_mobile` (Flutter app - this project, rebranded to Kontainer)
 
 ## Current Development Status
 
@@ -68,7 +68,7 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 
 ## 🚨 CRITICAL ISSUES - NEEDS FIXING
 
-### ~~Issue #1: Images Not Being Added to Totes~~ ✅ FIXED
+### ~~Issue #1: Images Not Being Added to Containers~~ ✅ FIXED
 
 **Status**: ✅ RESOLVED  
 **Priority**: HIGH  
@@ -86,13 +86,13 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 - Send image_paths and image_types arrays matching backend API
 
 **Verification:**
-- ✅ Create tote with images saves correctly
-- ✅ Add images to existing tote works
+- ✅ Create container with images saves correctly
+- ✅ Add images to existing container works
 - ✅ Images appear in mobile app
 - ✅ Images appear in web UI
 - ✅ Images persist in database
 
-### ~~Issue #2: Delete Tote Error~~ ✅ FIXED
+### ~~Issue #2: Delete Container Error~~ ✅ FIXED
 
 **Status**: ✅ RESOLVED  
 **Priority**: HIGH  
@@ -100,7 +100,7 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 
 **Problem:**
 - Delete appeared to fail with error message
-- Tote was actually deleted on backend but mobile showed error
+- Container was actually deleted on backend but mobile showed error
 - Home screen didn't refresh properly
 
 **Solution:**
@@ -113,7 +113,7 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 - ✅ Success message appears
 - ✅ Returns to home screen
 - ✅ Home screen refreshes
-- ✅ Tote removed from web UI
+- ✅ Container removed from web UI
 
 ### ~~Issue #3: Create Endpoint Wrong~~ ✅ FIXED
 
@@ -122,14 +122,14 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 **Fixed**: 2026-02-17
 
 **Problem:**
-- Create tote failed with 404 error
+- Create container failed with 404 error
 - Using wrong endpoint /api/totes (plural)
 
 **Solution:**
 - Changed to /api/tote (singular) to match backend
 
 **Verification:**
-- ✅ Create tote works with and without images
+- ✅ Create container works with and without images
 
 ### ~~Issue #4: Gallery Images Fail on Update~~ ✅ FIXED
 
@@ -138,7 +138,7 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 **Fixed**: 2026-02-17
 
 **Problem:**
-- Adding images from gallery to existing tote caused RangeError
+- Adding images from gallery to existing container caused RangeError
 - Error: "RangeError (start): invalid value: Not inclusive range 0..1:2"
 - Camera images worked fine, only gallery images failed
 - Issue occurred during update operation
@@ -150,7 +150,7 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 - The list indices already align with new images being added
 
 **Verification:**
-- ✅ Add gallery images to existing tote works
+- ✅ Add gallery images to existing container works
 - ✅ Add multiple gallery images works
 - ✅ Camera images still work
 - ✅ Mix of camera and gallery images works
@@ -162,21 +162,21 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 **Implemented**: Read-only view screen with edit button
 
 **Changes:**
-- Created `ToteViewScreen` for viewing tote details (read-only)
-- `ToteDetailScreen` now dedicated to editing (create/update)
+- Created `ContainerViewScreen` for viewing container details (read-only)
+- `ContainerDetailScreen` now dedicated to editing (create/update)
 - Updated navigation flow:
-  - Home screen → Tap tote → View screen
+  - Home screen → Tap container → View screen
   - View screen → Tap Edit button → Edit screen
   - QR scanner → View screen
   
 **Benefits:**
-- Prevents accidental edits when viewing totes
+- Prevents accidental edits when viewing containers
 - Cleaner separation of concerns
 - Better UX - intentional edit action required
 - Edit and Delete buttons both accessible from view screen
 
 **Files Modified:**
-- `lib/screens/tote_view_screen.dart` (NEW)
+- `lib/screens/kontainer_view_screen.dart` (NEW)
 - `lib/screens/home_screen.dart` (navigation update)
 - `lib/screens/scan_screen.dart` (navigation update)
 
@@ -192,16 +192,16 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 
 | Method | Endpoint | Purpose | Status |
 |--------|----------|---------|--------|
-| GET | `/api/totes` | List all totes | ✅ Working |
-| GET | `/api/tote/:id` | Get tote details | ✅ Working |
-| POST | `/api/tote` | Create new tote | ✅ Working |
-| PUT | `/api/tote/:id` | Update tote | ✅ Working |
+| GET | `/api/totes` | List all containers | ✅ Working |
+| GET | `/api/tote/:id` | Get container details | ✅ Working |
+| POST | `/api/tote` | Create new container | ✅ Working |
+| PUT | `/api/tote/:id` | Update container | ✅ Working |
 | POST | `/api/tote/:id/add-image` | Add image | ❌ Not working |
-| DELETE | `/api/tote/:id` | Delete tote | ⚠️ Not tested |
+| DELETE | `/api/tote/:id` | Delete container | ⚠️ Not tested |
 
 ### Expected Data Format
 
-**Tote Object (JSON):**
+**Container Object (JSON):**
 ```json
 {
   "id": 1,
@@ -252,7 +252,7 @@ type ToteImage struct {
 
 ### Mobile (Dart):
 ```dart
-class Tote {
+class Kontainer {
   final int id;
   final String name;
   final String description;
@@ -264,21 +264,21 @@ class Tote {
 }
 ```
 
-**Issue**: Mobile app doesn't have `ToteImage` model yet. Currently storing images as raw bytes, but should probably match backend structure.
+**Issue**: Mobile app doesn't have image detail model yet. Currently storing images as raw bytes, but should probably match backend structure.
 
 ## Testing Checklist
 
 ### Manual Testing Required
 
-- [ ] **Create Tote (No Images)**
+- [ ] **Create Container (No Images)**
   - Open mobile app
   - Click "Add New" button
   - Enter name and items
   - Click Save
-  - Verify tote appears in list
+  - Verify container appears in list
   - Verify in web UI
 
-- [ ] **Create Tote (With Images)**
+- [ ] **Create Container (With Images)**
   - Open mobile app
   - Click "Add New" button
   - Enter name and items
@@ -286,24 +286,24 @@ class Tote {
   - Click Save
   - ❌ **CURRENTLY BROKEN** - images not saved
 
-- [ ] **Update Tote (Text Only)**
-  - Click existing tote
+- [ ] **Update Container (Text Only)**
+  - Click existing container
   - Edit name or items
   - Click Update
   - ✅ **WORKING**
 
-- [ ] **Update Tote (Add Images)**
-  - Click existing tote
+- [ ] **Update Container (Add Images)**
+  - Click existing container
   - Select new images
   - Click Update
   - ❌ **CURRENTLY BROKEN** - images not added
 
-- [ ] **View Tote Images**
-  - Click tote with images (created from web UI)
+- [ ] **View Container Images**
+  - Click container with images (created from web UI)
   - ⚠️ **NOT TESTED** - need to implement image display
 
-- [ ] **Delete Tote**
-  - Click tote
+- [ ] **Delete Container**
+  - Click container
   - Click delete button
   - Confirm
   - ⚠️ **NOT TESTED**
@@ -314,7 +314,7 @@ class Tote {
 # Test backend is running
 curl http://localhost:3818/api/totes
 
-# Test create tote (should work)
+# Test create container (should work)
 curl -X POST http://localhost:3818/api/tote \
   -H "Content-Type: application/json" \
   -d '{"name":"Test","items":"Item 1\nItem 2"}'
@@ -354,7 +354,7 @@ flutter build apk --release
 ## Running the App
 
 ### Prerequisites
-1. ToteTrax backend must be running:
+1. Kontainer backend must be running:
    ```bash
    cd D:\projects\totetrax
    .\totetrax.exe
@@ -449,8 +449,8 @@ flutter run             # For connected Android/iOS device
 ## Known Web UI Features (for reference)
 
 The web UI has these features working correctly:
-- ✅ Create tote with multiple images
-- ✅ Add images to existing tote (additive)
+- ✅ Create container with multiple images
+- ✅ Add images to existing container (additive)
 - ✅ Delete individual images
 - ✅ View all images in gallery
 - ✅ Hover to preview all images
@@ -499,10 +499,10 @@ Mobile app should eventually match these features.
 
 4. **Test API directly**:
    ```bash
-   # Get all totes
+   # Get all containers
    curl http://localhost:3818/api/totes
    
-   # Create tote
+   # Create container
    curl -X POST http://localhost:3818/api/tote \
      -H "Content-Type: application/json" \
      -d '{"name":"Test","items":"Item 1"}'
@@ -525,7 +525,7 @@ Mobile app should eventually match these features.
 
 6. **Test on Windows first** - Easier to debug than Android emulator
 
-7. **Compare with FilaTrax Mobile** - Similar architecture, might have helpful examples
+7. **Compare with FilaTrax Mobile** - Similar architecture, might have helpful examples (note: backend project paths unchanged)
 
 ## Session End Checklist
 
@@ -541,16 +541,18 @@ Before ending session, verify:
 ## Session Summary (2026-02-17)
 
 ### Completed This Session
-1. ✅ Fixed gallery image RangeError when updating totes (v0.4.1)
+1. ✅ Fixed gallery image RangeError when updating containers (v0.4.1)
 2. ✅ Implemented view/edit screen separation (v0.5.0)
 3. ✅ Updated navigation flow for better UX
 4. ✅ Updated all documentation
+5. ✅ Rebranded app from ToteTrax to Kontainer
 
 ### Current Status
 - **All core features working**: CRUD, images, QR scanning, camera/gallery
 - **All critical bugs fixed**: Images upload correctly, delete works, gallery images work
 - **UX improved**: Separate view and edit modes prevent accidental changes
 - **Code quality**: Passes flutter analyze (4 minor style warnings)
+- **Branding**: Updated to Kontainer across all user-facing documentation
 
 ### For Next Session
 - Optional: Clean up lint warnings

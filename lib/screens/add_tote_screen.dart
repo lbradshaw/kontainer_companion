@@ -67,7 +67,7 @@ class _AddToteScreenState extends State<AddToteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Tote'),
+        title: const Text('Add New Kontainer'),
       ),
       body: Form(
         key: _formKey,
@@ -77,8 +77,8 @@ class _AddToteScreenState extends State<AddToteScreen> {
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(
-                labelText: 'Tote Name',
-                hintText: 'Enter tote name',
+                labelText: 'Kontainer Name',
+                hintText: 'Enter kontainer name',
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -112,7 +112,7 @@ class _AddToteScreenState extends State<AddToteScreen> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Save Tote'),
+                  : const Text('Save Kontainer'),
             ),
           ],
         ),

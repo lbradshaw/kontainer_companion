@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ToteTrax'),
+        title: const Text('Kontainer'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -123,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (_totes.isEmpty) {
       return const Center(
-        child: Text('No totes found. Tap + to add one.'),
+        child: Text('No kontainers found. Tap + to add one.'),
       );
     }
 

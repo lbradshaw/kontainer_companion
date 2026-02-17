@@ -61,7 +61,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading tote: $e')),
+          SnackBar(content: Text('Error loading kontainer: $e')),
         );
       }
     } finally {
@@ -255,7 +255,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
         
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Tote updated successfully')),
+            const SnackBar(content: Text('Kontainer updated successfully')),
           );
         }
       }else {
@@ -270,7 +270,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
         await _apiService.createTote(tote, imageMimeTypes: _imageMimeTypes);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Tote created successfully')),
+            const SnackBar(content: Text('Kontainer created successfully')),
           );
         }
       }
@@ -282,7 +282,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error saving tote: $e'),
+            content: Text('Error saving kontainer: $e'),
             backgroundColor: AppTheme.dangerColor,
           ),
         );
@@ -301,9 +301,9 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.cardColor,
-        title: const Text('Delete Tote', style: TextStyle(color: AppTheme.textColor)),
+        title: const Text('Delete Kontainer', style: TextStyle(color: AppTheme.textColor)),
         content: const Text(
-          'Are you sure you want to delete this tote?',
+          'Are you sure you want to delete this kontainer?',
           style: TextStyle(color: AppTheme.textSecondaryColor),
         ),
         actions: [
@@ -328,7 +328,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
         await _apiService.deleteTote(widget.tote!.id);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Tote deleted successfully')),
+            const SnackBar(content: Text('Kontainer deleted successfully')),
           );
           Navigator.pop(context, true);
         }
@@ -336,7 +336,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error deleting tote: $e'),
+              content: Text('Error deleting kontainer: $e'),
               backgroundColor: AppTheme.dangerColor,
             ),
           );
@@ -357,7 +357,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.cardColor,
-        title: Text(_isEditing ? 'Edit Tote' : 'New Tote'),
+        title: Text(_isEditing ? 'Edit Kontainer' : 'New Kontainer'),
         actions: [
           if (_isEditing)
             IconButton(
@@ -379,7 +379,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
                       controller: _nameController,
                       style: const TextStyle(color: AppTheme.textColor),
                       decoration: InputDecoration(
-                        labelText: 'Tote Name',
+                        labelText: 'Kontainer Name',
                         labelStyle: const TextStyle(color: AppTheme.accentColor),
                         enabledBorder: OutlineInputBorder(
                           borderSide: const BorderSide(color: AppTheme.borderColor),
@@ -530,7 +530,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
                         ),
                       ),
                       child: Text(
-                        _isEditing ? 'Update Tote' : 'Create Tote',
+                        _isEditing ? 'Update Kontainer' : 'Create Kontainer',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

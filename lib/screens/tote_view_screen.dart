@@ -39,7 +39,7 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading tote: $e')),
+          SnackBar(content: Text('Error loading kontainer: $e')),
         );
       }
     } finally {
@@ -94,9 +94,9 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.cardColor,
-        title: const Text('Delete Tote', style: TextStyle(color: AppTheme.textColor)),
+        title: const Text('Delete Kontainer', style: TextStyle(color: AppTheme.textColor)),
         content: const Text(
-          'Are you sure you want to delete this tote?',
+          'Are you sure you want to delete this kontainer?',
           style: TextStyle(color: AppTheme.textSecondaryColor),
         ),
         actions: [
@@ -121,7 +121,7 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
         await _apiService.deleteTote(_currentTote.id);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Tote deleted successfully')),
+            const SnackBar(content: Text('Kontainer deleted successfully')),
           );
           Navigator.pop(context, true);
         }
@@ -129,7 +129,7 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error deleting tote: $e'),
+              content: Text('Error deleting kontainer: $e'),
               backgroundColor: AppTheme.dangerColor,
             ),
           );
@@ -150,7 +150,7 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.cardColor,
-        title: const Text('Tote Details'),
+        title: const Text('Kontainer Details'),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit, color: AppTheme.accentColor),

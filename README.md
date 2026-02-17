@@ -1,19 +1,19 @@
-# ToteTrax Mobile
+# Kontainer Mobile
 
-Companion mobile app for ToteTrax storage tote inventory management system.
+Companion mobile app for Kontainer storage container inventory management system.
 
 ## Overview
 
-ToteTrax Mobile is a Flutter-based mobile application that connects to the ToteTrax backend server to manage storage totes. The app provides QR code scanning capabilities to quickly access and update tote information.
+Kontainer Mobile is a Flutter-based mobile application that connects to the Kontainer backend server to manage storage containers. The app provides QR code scanning capabilities to quickly access and update container information.
 
 ## Features
 
-- **QR Code Scanning**: Scan tote QR codes to instantly view tote details
-- **Tote Management**: View, add, and edit storage totes
-- **Image Gallery**: View multiple images associated with each tote
-- **Item List Management**: Track items stored in each tote with quantities
+- **QR Code Scanning**: Scan container QR codes to instantly view container details
+- **Container Management**: View, add, and edit storage containers
+- **Image Gallery**: View multiple images associated with each container
+- **Item List Management**: Track items stored in each container with quantities
 - **Server Configuration**: Flexible server connection settings
-- **Dark/Light Mode**: Theme support synchronized with ToteTrax web app
+- **Dark/Light Mode**: Theme support synchronized with Kontainer web app
 
 ## Technology Stack
 
@@ -41,7 +41,7 @@ lib/
 ### Prerequisites
 
 - Flutter SDK (>=3.0.0)
-- ToteTrax backend server running
+- Kontainer backend server running
 
 ### Installation
 
@@ -86,11 +86,11 @@ flutter build macos
 
 ## Configuration
 
-On first launch, configure the ToteTrax server URL in the settings screen.
+On first launch, configure the Kontainer server URL in the settings screen.
 
 ## Development
 
-This project follows the same architecture patterns as FilaTrax Mobile, adapted for storage tote management.
+This project follows the same architecture patterns as FilaTrax Mobile, adapted for storage container management.
 
 ## License
 
@@ -98,5 +98,5 @@ Private project - not published to pub.dev
 
 ## Related Projects
 
-- **ToteTrax**: Main backend server (Go + HTML/CSS/JS)
+- **Kontainer**: Main backend server (Go + HTML/CSS/JS)
 - **FilaTrax**: Filament inventory management system

@@ -1,5 +1,5 @@
-name: totetrax_mobile
-description: Companion mobile app for ToteTrax storage tote inventory management
+name: kontainer_mobile
+description: Companion mobile app for Kontainer storage container inventory management
 
 publish_to: 'none' # Do not publish to pub.dev
 

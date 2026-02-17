@@ -84,8 +84,8 @@ class _ScanScreenState extends State<ScanScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Tote Not Found'),
-          content: Text('QR Code: $qrCode\n\nNo tote found with this QR code.'),
+          title: const Text('Kontainer Not Found'),
+          content: Text('QR Code: $qrCode\n\nNo kontainer found with this QR code.'),
           actions: [
             TextButton(
               onPressed: () {
