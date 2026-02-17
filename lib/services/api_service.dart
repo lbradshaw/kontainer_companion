@@ -17,8 +17,19 @@ class ApiService {
     final response = await http.get(Uri.parse('$url/api/totes'));
     
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      return data.map((json) => Tote.fromJson(json)).toList();
+      // Handle empty or null response
+      if (response.body.isEmpty || response.body == 'null') {
+        return [];
+      }
+      
+      final decoded = json.decode(response.body);
+      
+      // If null or not a list, return empty list
+      if (decoded == null || decoded is! List) {
+        return [];
+      }
+      
+      return decoded.map<Tote>((json) => Tote.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load totes');
     }
