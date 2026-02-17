@@ -257,6 +257,12 @@ Matches ToteTrax web application design:
 
 ## Version History
 
+- **v0.4.1** (Feb 2026) - Gallery Image Update Fix
+  - **FIXED: Gallery image update bug** - RangeError when adding gallery images to existing totes
+    - MIME types list only tracks new images, not existing ones from database
+    - Fixed sublist calculation in tote_detail_screen.dart (line 244)
+    - Gallery and camera images now work correctly for both create and update operations
+
 - **v0.4.0** (Feb 2026) - Critical Bug Fixes
   - **FIXED: Image upload bug** - Images now save correctly to database
     - Track MIME types from XFile when picking images

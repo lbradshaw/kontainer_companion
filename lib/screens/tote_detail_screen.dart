@@ -241,8 +241,9 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
         // Add new images separately (those not in original tote)
         if (_images.length > _originalImageCount) {
           final newImages = _images.sublist(_originalImageCount);
-          final newMimeTypes = _imageMimeTypes.sublist(_originalImageCount);
-          await _apiService.addImagesToTote(widget.tote!.id, newImages, newMimeTypes);
+          // _imageMimeTypes only contains MIME types for NEW images (not existing ones)
+          // So we use it directly without sublist
+          await _apiService.addImagesToTote(widget.tote!.id, newImages, _imageMimeTypes);
         }
         
         // Reload tote data to get fresh state from server

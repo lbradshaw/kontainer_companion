@@ -129,6 +129,30 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 **Verification:**
 - ✅ Create tote works with and without images
 
+### ~~Issue #4: Gallery Images Fail on Update~~ ✅ FIXED
+
+**Status**: ✅ RESOLVED  
+**Priority**: HIGH  
+**Fixed**: 2026-02-17
+
+**Problem:**
+- Adding images from gallery to existing tote caused RangeError
+- Error: "RangeError (start): invalid value: Not inclusive range 0..1:2"
+- Camera images worked fine, only gallery images failed
+- Issue occurred during update operation
+
+**Solution:**
+- `_imageMimeTypes` list only contains MIME types for NEW images, not existing ones
+- When updating, existing images have no MIME types in the list (cleared on load)
+- Fixed by using `_imageMimeTypes` directly instead of `sublist(_originalImageCount)`
+- The list indices already align with new images being added
+
+**Verification:**
+- ✅ Add gallery images to existing tote works
+- ✅ Add multiple gallery images works
+- ✅ Camera images still work
+- ✅ Mix of camera and gallery images works
+
 ## Backend Connection
 
 ### Server Information
