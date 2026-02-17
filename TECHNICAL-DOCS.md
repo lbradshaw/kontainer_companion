@@ -174,9 +174,15 @@ Matches ToteTrax web application design:
 - (Future: theme toggle, other preferences)
 
 #### Scan Screen
-- Placeholder for QR scanner
-- "Coming Soon" message
-- Camera permission note
+- Full QR code scanner using mobile_scanner
+- Real-time camera view with overlay
+- Visual scanning frame with corner indicators
+- Automatic tote lookup by QR code
+- Navigation to tote detail on successful scan
+- Error dialog for totes not found
+- Flashlight toggle button
+- Camera switch button (front/back)
+- Works with printed QR codes (not reliable with screens)
 
 ## Current Implementation Status
 
@@ -185,6 +191,7 @@ Matches ToteTrax web application design:
 - Theme system matching ToteTrax web
 - Data models (Tote, ToteImage)
 - API service with full CRUD operations including image management
+- QR code lookup API endpoint (`getToteByQRCode`)
 - Home screen with tote list
 - Add tote screen with form validation
 - Tote detail/edit screen with:
@@ -195,17 +202,24 @@ Matches ToteTrax web application design:
   - Auto-refresh on load
   - Delete tote functionality
 - Settings screen (basic server URL)
-- Scan screen (placeholder)
+- **QR code scanner (fully functional)**:
+  - Real-time camera scanning
+  - Visual overlay with scanning frame
+  - Automatic tote lookup and navigation
+  - Error handling for missing totes
+  - Flashlight and camera switch controls
+  - Works with printed QR codes
+- Camera permissions (Android + iOS)
 - Pull-to-refresh
 - Error handling and loading states
 - Navigation between screens
 - Responsive Material Design UI
 - Image picker integration (camera + gallery)
 - Base64 image encoding/decoding
-- Code analysis passing with no issues
+- Code analysis passing with minimal warnings
 
 ### 🚧 Planned/Future
-- QR code scanner implementation with actual scanning
+- Fix image upload (critical - images not saving to backend)
 - Server connectivity testing
 - Shared preferences for settings persistence
 - Offline support with local caching
@@ -215,6 +229,7 @@ Matches ToteTrax web application design:
 - Image compression for large photos
 - Batch image operations
 - Image reordering
+- Manual QR code entry option
 
 ## Key Features & Implementation Details
 
@@ -241,6 +256,15 @@ Matches ToteTrax web application design:
 
 ## Version History
 
+- **v0.3.0** (Feb 2026) - QR Scanner Implementation
+  - Full QR code scanner using mobile_scanner package
+  - Real-time barcode detection with visual overlay
+  - Automatic tote lookup by QR code (GET /api/tote/qr/{code})
+  - Camera permissions configured (Android + iOS)
+  - Flashlight and camera switching
+  - Error handling for totes not found
+  - Works reliably with printed QR codes
+
 - **v0.2.0** (Feb 2026) - Image Management Update
   - Added full image CRUD operations
   - Camera and gallery integration
@@ -259,14 +283,19 @@ Matches ToteTrax web application design:
 ## Platform-Specific Considerations
 
 ### Android
-- Camera permissions in AndroidManifest.xml
+- Camera permissions configured in AndroidManifest.xml:
+  - `android.permission.CAMERA`
+  - Hardware feature declarations (camera, autofocus)
 - Minimum SDK version: 21 (Android 5.0)
 - Uses Material Design
+- QR scanner fully functional
 
 ### iOS
-- Camera usage description in Info.plist
+- Camera usage description in Info.plist:
+  - `NSCameraUsageDescription`: "ToteTrax needs camera access to scan QR codes on storage totes"
 - Minimum iOS version: 12.0
 - Uses Cupertino design where appropriate
+- QR scanner fully functional
 
 ### Web
 - Camera access through browser APIs

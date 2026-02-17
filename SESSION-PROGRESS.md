@@ -1,6 +1,6 @@
 # ToteTrax Mobile - Current Session Progress & Known Issues
 
-**Last Updated**: 2026-02-16  
+**Last Updated**: 2026-02-17  
 **Session Context**: Development of ToteTrax Mobile companion app
 
 ## Project Overview
@@ -17,9 +17,9 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 
 1. **Project Setup**
    - Flutter project scaffolded based on FilaTrax Mobile
-   - Dependencies configured (http, mobile_scanner, shared_preferences, provider)
+   - Dependencies configured (http, mobile_scanner, shared_preferences, provider, image_picker)
    - Git repository initialized
-   - Code analysis passing with no issues
+   - Code analysis passing with minimal warnings
 
 2. **Theme & UI**
    - Custom theme matching ToteTrax web app colors
@@ -33,13 +33,14 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
    - Add tote screen with form
    - Tote detail/edit screen with camera/image picker
    - Settings screen (placeholder)
-   - Scan screen (placeholder)
+   - **QR code scanner (fully functional)**
 
 4. **API Integration**
    - `ApiService` class with full CRUD operations
    - GET /api/totes (list all)
    - GET /api/tote/:id (get single)
-   - POST /api/totes (create new)
+   - **GET /api/tote/qr/:qrCode (lookup by QR code)** ✅ NEW
+   - POST /api/tote (create new)
    - PUT /api/tote/:id (update)
    - POST /api/tote/:id/add-image (add images)
    - DELETE /api/tote/:id (delete)
@@ -48,6 +49,20 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
    - MaterialApp with routes
    - Navigation between screens
    - Back button handling
+
+6. **QR Code Scanner** ✅ NEWLY COMPLETED (v0.3.0)
+   - Full mobile_scanner integration
+   - Real-time camera view with overlay
+   - Visual scanning frame with corner indicators
+   - Automatic QR code detection
+   - Automatic tote lookup by QR code
+   - Navigation to tote detail on success
+   - Error handling for missing totes
+   - Flashlight toggle button
+   - Camera switch button (front/back)
+   - Camera permissions configured (Android + iOS)
+   - Works reliably with printed QR codes
+   - Known limitation: May not scan from computer screens (normal behavior)
 
 ## 🚨 CRITICAL ISSUES - NEEDS FIXING
 

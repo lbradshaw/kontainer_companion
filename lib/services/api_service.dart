@@ -35,6 +35,19 @@ class ApiService {
     }
   }
 
+  Future<Tote> getToteByQRCode(String qrCode) async {
+    final url = await _getBaseUrl();
+    final response = await http.get(Uri.parse('$url/api/tote/qr/$qrCode'));
+    
+    if (response.statusCode == 200) {
+      return Tote.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 404) {
+      throw Exception('Tote not found');
+    } else {
+      throw Exception('Failed to load tote');
+    }
+  }
+
   Future<Tote> createTote(Tote tote) async {
     final url = await _getBaseUrl();
     final Map<String, dynamic> body = {

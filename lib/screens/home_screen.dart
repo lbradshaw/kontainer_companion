@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/tote.dart';
 import '../services/api_service.dart';
 import '../utils/theme.dart';
-import 'add_tote_screen.dart';
 import 'settings_screen.dart';
 import 'scan_screen.dart';
 import 'tote_detail_screen.dart';
