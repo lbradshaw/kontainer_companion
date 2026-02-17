@@ -43,9 +43,10 @@ totetrax_mobile/
 │   │   └── tote.dart          # Tote data model
 │   ├── screens/               # App screens
 │   │   ├── home_screen.dart       # Main tote list view
-│   │   ├── add_tote_screen.dart   # Add new tote form
-│   │   ├── tote_detail_screen.dart # View/edit tote details
-│   │   ├── scan_screen.dart        # QR code scanner (placeholder)
+│   │   ├── add_tote_screen.dart   # Add new tote form (deprecated)
+│   │   ├── tote_view_screen.dart  # View tote details (read-only)
+│   │   ├── tote_detail_screen.dart # Edit tote (create/update)
+│   │   ├── scan_screen.dart        # QR code scanner
 │   │   └── settings_screen.dart    # Server configuration
 │   ├── services/              # Business logic
 │   │   └── api_service.dart   # Backend API communication
@@ -139,34 +140,41 @@ Matches ToteTrax web application design:
 - List of tote cards showing:
   - Tote name (bold/large)
   - First 3 lines of items
+- Tap card to view tote details
 - Pull-to-refresh functionality
 - Loading spinner when fetching data
 - Error state with retry button
 - Empty state message
 
-#### Add Tote Screen
-- Form with:
-  - Tote Name text field (required)
-  - Items text area (10 lines, required)
-- Save button with loading state
-- Validation before submission
-- Back navigation on success
+#### Tote View Screen (Read-Only)
+- View tote details without editing
+- AppBar with Edit and Delete buttons
+- Display sections:
+  - Tote name (large, bold)
+  - Items list (full text)
+  - QR code (if available)
+  - Images grid (tap for full-size view)
+- Pull-to-refresh to sync with server
+- Edit button navigates to edit screen
+- Delete button with confirmation dialog
 
-#### Tote Detail Screen
-- AppBar with delete button
-- Editable form:
-  - Tote name text field
+#### Tote Detail Screen (Create/Edit)
+- Form for creating new totes or editing existing ones
+- Fields:
+  - Tote Name text field (required)
   - Items text area (multiline)
 - Image management:
   - Grid view of all tote images
   - Add images from camera or gallery
-  - Delete images (tap to mark X, confirmed on save)
+  - Delete images (tap X button)
   - View full-size images on tap
-- QR code display (if available)
-- Update button to save changes
-- Real-time refresh on screen load to sync with backend
-- Delete confirmation dialog
-- Error handling
+- Save/Update button with loading state
+- Validation before submission
+- Returns to previous screen on success
+
+#### Add Tote Screen (Deprecated)
+- Legacy screen, functionality moved to Tote Detail Screen
+- May be removed in future version
 
 #### Settings Screen
 - Server URL configuration
@@ -256,6 +264,19 @@ Matches ToteTrax web application design:
 - No local caching to avoid stale data issues
 
 ## Version History
+
+- **v0.5.0** (Feb 2026) - View/Edit Screen Separation
+  - **NEW: Separate view and edit screens**
+    - Created ToteViewScreen for read-only viewing
+    - ToteDetailScreen now dedicated to editing (create/update)
+    - Improved UX by preventing accidental edits
+    - Edit button on view screen navigates to edit mode
+    - Delete button remains accessible on view screen
+  - Navigation updates:
+    - Home screen taps now go to view screen
+    - QR scanner navigates to view screen
+    - Pull-to-refresh on view screen
+  - Better separation of concerns
 
 - **v0.4.1** (Feb 2026) - Gallery Image Update Fix
   - **FIXED: Gallery image update bug** - RangeError when adding gallery images to existing totes
