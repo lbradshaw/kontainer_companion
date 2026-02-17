@@ -208,6 +208,46 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                     ),
                     const SizedBox(height: 16),
 
+                    // Location
+                    if (_currentTote.location != null && _currentTote.location!.isNotEmpty) ...[
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppTheme.cardColor,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppTheme.borderColor),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(Icons.location_on, color: AppTheme.accentColor, size: 18),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Location',
+                                  style: TextStyle(
+                                    color: AppTheme.accentColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _currentTote.location!,
+                              style: const TextStyle(
+                                color: AppTheme.textColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
                     // Items List
                     Container(
                       padding: const EdgeInsets.all(16),

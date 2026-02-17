@@ -88,6 +88,7 @@ class Tote {
   final int id;
   final String name;
   final String items;       // Newline-separated item list
+  final String? location;   // Physical storage location (optional)
   final String? qrCode;     // Base64 data URI for QR code image
   final List<ToteImage> images; // List of images stored in database
   
@@ -153,6 +154,7 @@ Matches Kontainer web application design:
 - AppBar with Edit and Delete buttons
 - Display sections:
   - Kontainer name (large, bold)
+  - Location (with 📍 icon, if set)
   - Items list (full text)
   - QR code (if available)
   - Images grid (tap for full-size view)
@@ -164,6 +166,7 @@ Matches Kontainer web application design:
 - Form for creating new kontainers or editing existing ones
 - Fields:
   - Kontainer Name text field (required)
+  - Location text field (optional) with location icon
   - Items text area (multiline)
 - Image management:
   - Grid view of all kontainer images
@@ -282,6 +285,18 @@ Matches Kontainer web application design:
 - All kontainer updates are synchronized in real-time
 
 ## Version History
+
+- **v0.7.0** (Feb 2026) - Location Field Support
+  - **NEW: Location field for kontainers**
+    - Added optional location field to Tote model
+    - Location input on create/edit screen with icon
+    - Location display on view screen (when set)
+    - Placeholder text with example locations
+    - Fully integrated with backend API v1.7.0+
+  - Backend compatibility:
+    - Sends location in create and update requests
+    - Receives location in all API responses
+    - Handles null/empty locations gracefully
 
 - **v0.6.0** (Feb 2026) - Kontainer Rebrand & Search
   - **Rebranded from ToteTrax to Kontainer**

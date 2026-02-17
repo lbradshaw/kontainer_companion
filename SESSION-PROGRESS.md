@@ -1,8 +1,8 @@
 # Kontainer Mobile - Current Session Progress & Known Issues
 
-**Last Updated**: 2026-02-17 22:09 UTC  
+**Last Updated**: 2026-02-17 22:45 UTC  
 **Session Context**: Development of Kontainer Mobile companion app
-**Current Version**: v0.6.0
+**Current Version**: v0.7.0
 
 ## Project Overview
 
@@ -157,7 +157,35 @@ Kontainer Mobile is a Flutter-based mobile companion app for the Kontainer stora
 - ✅ Camera images still work
 - ✅ Mix of camera and gallery images works
 
-## Recent Updates (v0.6.0 - 2026-02-17)
+## Recent Updates (v0.7.0 - 2026-02-17)
+
+### ✅ Location Field Support
+
+**Implemented**: Optional location field for kontainers
+
+**Changes:**
+- **Data Model**: Added `location` field to Tote class (optional String)
+- **View Screen**: Displays location with 📍 icon when set
+- **Edit Screen**: Added location text input with placeholder examples
+- **API Service**: Sends location in create/update requests
+- **Backend API**: Compatible with Kontainer server v1.7.0+
+
+**Features:**
+- Location text field with icon on create/edit screen
+- Placeholder: "e.g., Garage, Basement, Storage Unit A"
+- Optional field - can be left empty
+- Location section on view screen (only shown if set)
+- Graceful handling of null/empty locations
+- Full backward compatibility with older data
+
+**Files Modified:**
+- `lib/models/tote.dart` (added location field)
+- `lib/screens/tote_view_screen.dart` (display location)
+- `lib/screens/tote_detail_screen.dart` (edit location)
+- `lib/services/api_service.dart` (send location in API calls)
+- `TECHNICAL-DOCS.md` (updated documentation)
+
+## Recent Updates (v0.6.0 - 2026-02-17 Earlier)
 
 ### ✅ Kontainer Rebrand
 
@@ -593,35 +621,43 @@ Before ending session, verify:
 ### Completed This Session
 1. ✅ Fixed gallery image RangeError when updating containers (v0.4.1 - earlier)
 2. ✅ Implemented view/edit screen separation (v0.5.0 - earlier)
-3. ✅ **Rebranded app from ToteTrax to Kontainer (v0.6.0)**
+3. ✅ **Rebranded app from ToteTrax to Kontainer (v0.6.0 - earlier)**
    - Package name changed to kontainer_mobile
    - All UI text updated to "Kontainer"
    - Documentation fully updated
-4. ✅ **Added search functionality (v0.6.0)**
+4. ✅ **Added search functionality (v0.6.0 - earlier)**
    - Search by name or items
    - Search screen with results display
    - Search button in AppBar
-5. ✅ **Added refresh button to home screen (v0.6.0)**
+5. ✅ **Added refresh button to home screen (v0.6.0 - earlier)**
    - Manual sync with backend
    - Disabled while loading
-6. ✅ **Fixed empty database error (v0.6.0)**
+6. ✅ **Fixed empty database error (v0.6.0 - earlier)**
    - No type error when database is empty
    - Proper null/empty list handling
    - Friendly empty state message
+7. ✅ **Added location field support (v0.7.0 - current)**
+   - Optional location field in data model
+   - Location input on create/edit screen
+   - Location display on view screen
+   - Backend API integration (v1.7.0+)
+   - Full backward compatibility
 
 ### Current Status
-- **Version**: v0.6.0 (Kontainer rebrand release)
-- **All core features working**: CRUD, images, QR scanning, camera/gallery, search
+- **Version**: v0.7.0 (Location field update)
+- **All core features working**: CRUD, images, QR scanning, camera/gallery, search, location
 - **All critical bugs fixed**: Images upload correctly, delete works, gallery images work, empty DB handled
 - **UX improved**: 
   - Separate view and edit modes prevent accidental changes
   - Search functionality for finding kontainers
   - Manual refresh button for syncing
+  - Location tracking for physical storage
   - Better empty states
 - **Code quality**: Passes flutter analyze (4 minor style warnings)
-- **Branding**: Fully rebranded to Kontainer
+- **Backend compatibility**: Works with Kontainer server v1.7.0+
 
 ### Git Commits (refactor branch)
+- (pending) - Add location field support to mobile app
 - `b6965dc` - Add refresh button to home screen
 - `ea84ceb` - Fix null/empty list handling in getTotes API
 - `7e80a60` - Add search functionality for kontainers
@@ -633,9 +669,11 @@ Before ending session, verify:
 - Consider: Image compression for large photos
 - Consider: Settings persistence with shared_preferences
 - Consider: Offline caching with sqflite
+- Consider: Location autocomplete/suggestions
+- Consider: Filter/group by location
 - Consider: Merge refactor branch to master
 
 **End of Session Progress Document**
 
-*Last Updated: 2026-02-17 22:09 UTC*  
-*Next Session: Merge refactor branch, optional polish and enhancements*
+*Last Updated: 2026-02-17 22:45 UTC*  
+*Next Session: Optional polish and enhancements*

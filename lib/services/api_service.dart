@@ -64,6 +64,7 @@ class ApiService {
     final Map<String, dynamic> body = {
       'name': tote.name,
       'items': tote.items,
+      'location': tote.location ?? '',
     };
     
     // Add images in data URI format if provided
@@ -114,6 +115,7 @@ class ApiService {
     final Map<String, dynamic> body = {
       'name': tote.name,
       'items': tote.items,
+      'location': tote.location ?? '',
     };
     
     try {

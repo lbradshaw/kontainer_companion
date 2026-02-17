@@ -17,6 +17,7 @@ class ToteDetailScreen extends StatefulWidget {
 class _ToteDetailScreenState extends State<ToteDetailScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _locationController = TextEditingController();
   final _itemsController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   final ApiService _apiService = ApiService();
@@ -51,6 +52,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
       
       setState(() {
         _nameController.text = freshTote.name;
+        _locationController.text = freshTote.location ?? '';
         _itemsController.text = freshTote.items;
         _images = List.from(freshTote.images);
         _imageMimeTypes = []; // Clear MIME types (existing images already in DB)
@@ -74,6 +76,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _locationController.dispose();
     _itemsController.dispose();
     super.dispose();
   }
@@ -232,6 +235,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
         final toteUpdate = Tote(
           id: widget.tote!.id,
           name: _nameController.text,
+          location: _locationController.text.isEmpty ? null : _locationController.text,
           items: _itemsController.text,
           qrCode: widget.tote!.qrCode,
           images: [], // Don't send existing images in update
@@ -263,6 +267,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
         final tote = Tote(
           id: 0,
           name: _nameController.text,
+          location: _locationController.text.isEmpty ? null : _locationController.text,
           items: _itemsController.text,
           qrCode: '',
           images: _images,
@@ -404,6 +409,26 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
                         }
                         return null;
                       },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _locationController,
+                      style: const TextStyle(color: AppTheme.textColor),
+                      decoration: InputDecoration(
+                        labelText: 'Location (optional)',
+                        hintText: 'e.g., Garage, Basement, Storage Unit A',
+                        hintStyle: const TextStyle(color: AppTheme.textSecondaryColor),
+                        labelStyle: const TextStyle(color: AppTheme.accentColor),
+                        prefixIcon: const Icon(Icons.location_on, color: AppTheme.accentColor),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: AppTheme.borderColor),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: AppTheme.accentColor),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(

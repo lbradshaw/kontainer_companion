@@ -5,6 +5,7 @@ class Tote {
   final int id;
   final String name;
   final String items;
+  final String? location;
   final String? qrCode;
   final List<Uint8List> images;
   final List<int> imageIds;
@@ -13,6 +14,7 @@ class Tote {
     required this.id,
     required this.name,
     required this.items,
+    this.location,
     this.qrCode,
     this.images = const [],
     this.imageIds = const [],
@@ -59,6 +61,7 @@ class Tote {
       id: json['id'],
       name: json['name'],
       items: json['items'] ?? '',
+      location: json['location'],
       qrCode: json['qr_code'],
       images: imagesList,
       imageIds: imageIdsList,
@@ -70,6 +73,7 @@ class Tote {
       'id': id,
       'name': name,
       'items': items,
+      'location': location ?? '',
       'qr_code': qrCode,
     };
   }
