@@ -48,20 +48,37 @@ class ApiService {
     }
   }
 
-  Future<Tote> createTote(Tote tote) async {
+  Future<Tote> createTote(Tote tote, {List<String>? imageMimeTypes}) async {
     final url = await _getBaseUrl();
     final Map<String, dynamic> body = {
       'name': tote.name,
       'items': tote.items,
     };
     
+    // Add images in data URI format if provided
     if (tote.images.isNotEmpty) {
-      body['images'] = tote.images.map((img) => base64Encode(img)).toList();
+      final List<String> imageDataUris = [];
+      final List<String> mimeTypes = [];
+      
+      for (int i = 0; i < tote.images.length; i++) {
+        final mimeType = (imageMimeTypes != null && i < imageMimeTypes.length) 
+            ? imageMimeTypes[i] 
+            : 'image/jpeg';
+        
+        final base64Data = base64Encode(tote.images[i]);
+        final dataUri = 'data:$mimeType;base64,$base64Data';
+        
+        imageDataUris.add(dataUri);
+        mimeTypes.add(mimeType);
+      }
+      
+      body['image_paths'] = imageDataUris;
+      body['image_types'] = mimeTypes;
     }
     
     try {
       final response = await http.post(
-        Uri.parse('$url/api/totes'),
+        Uri.parse('$url/api/tote'),  // Changed from /api/totes to /api/tote (singular)
         headers: {'Content-Type': 'application/json'},
         body: json.encode(body),
       ).timeout(
@@ -74,7 +91,7 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Tote.fromJson(json.decode(response.body));
       } else {
-        throw Exception('Failed to create tote: ${response.body}');
+        throw Exception('Failed to create tote: ${response.statusCode} ${response.body}');
       }
     } catch (e) {
       throw Exception('Network error: $e');
@@ -108,15 +125,22 @@ class ApiService {
     }
   }
   
-  Future<void> addImagesToTote(int toteId, List<Uint8List> images) async {
+  Future<void> addImagesToTote(int toteId, List<Uint8List> images, List<String> mimeTypes) async {
     final url = await _getBaseUrl();
     try {
-      for (final imageData in images) {
+      for (int i = 0; i < images.length; i++) {
+        final imageData = images[i];
+        final mimeType = i < mimeTypes.length ? mimeTypes[i] : 'image/jpeg';
+        
+        // Convert to base64 and create data URI format that backend expects
+        final base64Data = base64Encode(imageData);
+        final dataUri = 'data:$mimeType;base64,$base64Data';
+        
         final response = await http.post(
           Uri.parse('$url/api/tote/$toteId/add-image'),
           headers: {'Content-Type': 'application/json'},
           body: json.encode({
-            'image_data': base64Encode(imageData),
+            'image_data': dataUri,
           }),
         ).timeout(
           const Duration(seconds: 30),
@@ -158,7 +182,8 @@ class ApiService {
     final url = await _getBaseUrl();
     final response = await http.delete(Uri.parse('$url/api/tote/$id'));
     
-    if (response.statusCode != 200) {
+    // Backend returns 204 No Content on successful delete
+    if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception('Failed to delete tote');
     }
   }

@@ -22,6 +22,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
   final ApiService _apiService = ApiService();
   
   List<Uint8List> _images = [];
+  List<String> _imageMimeTypes = []; // Track MIME types for new images
   List<int> _imageIds = []; // Track image IDs from backend
   List<int> _deletedImageIds = []; // Track which images to delete
   bool _isLoading = false;
@@ -52,6 +53,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
         _nameController.text = freshTote.name;
         _itemsController.text = freshTote.items;
         _images = List.from(freshTote.images);
+        _imageMimeTypes = []; // Clear MIME types (existing images already in DB)
         _imageIds = List.from(freshTote.imageIds);
         _originalImageCount = freshTote.images.length;
         _deletedImageIds.clear();
@@ -87,8 +89,11 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
 
       if (image != null) {
         final bytes = await image.readAsBytes();
+        // Store both bytes and MIME type
         setState(() {
           _images.add(bytes);
+          // XFile.mimeType gives us the MIME type (e.g., "image/jpeg")
+          _imageMimeTypes.add(image.mimeType ?? 'image/jpeg');
         });
       }
     } catch (e) {
@@ -115,6 +120,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
         final bytes = await image.readAsBytes();
         setState(() {
           _images.add(bytes);
+          _imageMimeTypes.add(image.mimeType ?? 'image/jpeg');
         });
       }
     } catch (e) {
@@ -235,7 +241,8 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
         // Add new images separately (those not in original tote)
         if (_images.length > _originalImageCount) {
           final newImages = _images.sublist(_originalImageCount);
-          await _apiService.addImagesToTote(widget.tote!.id, newImages);
+          final newMimeTypes = _imageMimeTypes.sublist(_originalImageCount);
+          await _apiService.addImagesToTote(widget.tote!.id, newImages, newMimeTypes);
         }
         
         // Reload tote data to get fresh state from server
@@ -259,7 +266,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
           qrCode: '',
           images: _images,
         );
-        await _apiService.createTote(tote);
+        await _apiService.createTote(tote, imageMimeTypes: _imageMimeTypes);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Tote created successfully')),

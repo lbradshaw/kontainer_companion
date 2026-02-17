@@ -219,7 +219,8 @@ Matches ToteTrax web application design:
 - Code analysis passing with minimal warnings
 
 ### 🚧 Planned/Future
-- Fix image upload (critical - images not saving to backend)
+- ~~Fix image upload (critical - images not saving to backend)~~ ✅ FIXED v0.4.0
+- ~~Fix delete tote error~~ ✅ FIXED v0.4.0
 - Server connectivity testing
 - Shared preferences for settings persistence
 - Offline support with local caching
@@ -255,6 +256,17 @@ Matches ToteTrax web application design:
 - No local caching to avoid stale data issues
 
 ## Version History
+
+- **v0.4.0** (Feb 2026) - Critical Bug Fixes
+  - **FIXED: Image upload bug** - Images now save correctly to database
+    - Track MIME types from XFile when picking images
+    - Send images in data URI format: `data:image/jpeg;base64,{data}`
+    - Send image_paths and image_types arrays to backend
+    - Works for both create and add-image operations
+  - **FIXED: Delete tote bug** - Accept 204 No Content status code
+  - **FIXED: Create endpoint** - Changed from /api/totes to /api/tote
+  - All CRUD operations now working correctly
+  - Images persist in database and display in web UI
 
 - **v0.3.0** (Feb 2026) - QR Scanner Implementation
   - Full QR code scanner using mobile_scanner package

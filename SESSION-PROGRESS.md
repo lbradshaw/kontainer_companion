@@ -66,102 +66,68 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 
 ## 🚨 CRITICAL ISSUES - NEEDS FIXING
 
-### Issue #1: Images Not Being Added to Totes
+### ~~Issue #1: Images Not Being Added to Totes~~ ✅ FIXED
 
-**Status**: ❌ BROKEN  
+**Status**: ✅ RESOLVED  
 **Priority**: HIGH  
-**Affects**: Mobile app → Backend image upload
+**Fixed**: 2026-02-17
 
-**Symptoms:**
-- User can select images from gallery or camera
-- Images appear to upload (no error shown)
-- But images are NOT saved to the tote in the database
-- Web UI shows the tote but with no images
+**Problem:**
+- Mobile app was sending plain base64 encoded images
+- Backend expected data URI format with MIME type prefix
+- Images appeared to upload but were not saved to database
 
-**Investigation Needed:**
-1. Check if mobile app is sending correct API request format
-2. Verify backend endpoint `/api/tote/:id/add-image` is receiving data
-3. Compare mobile app request to working web UI request
-4. Check if base64 encoding is correct
-5. Verify MIME type is being sent correctly
-
-**Current Mobile Code:**
-```dart
-// In api_service.dart
-Future<void> addImagesToTote(int toteId, List<Uint8List> images) async {
-  for (final imageData in images) {
-    final response = await http.post(
-      Uri.parse('$baseUrl/api/tote/$toteId/add-image'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'image_data': base64Encode(imageData),
-      }),
-    );
-  }
-}
-```
-
-**Backend Endpoint Expected Format:**
-- Check `D:\projects\totetrax\internal\api\handlers.go`
-- Look at `AddImageToToteHandler` function
-- Compare with web UI's `form.js` implementation
-
-**Next Steps:**
-1. Check backend server logs when mobile app submits image
-2. Add debug logging to see exact JSON payload being sent
-3. Test backend endpoint with curl/Postman to verify it works
-4. Compare working web UI request vs mobile app request
-5. Fix mobile app to match expected format
-
-### Issue #2: API Endpoint Mismatch (404 Errors)
-
-**Status**: ❌ PARTIALLY FIXED  
-**Priority**: HIGH  
-**Affects**: Create and update operations
-
-**Background:**
-- Mobile app was getting 404 errors when updating totes
-- Issue: Mobile app calling different endpoints than web UI
-
-**Resolution:**
-- Updated mobile `ApiService` to match web UI endpoints:
-  - Changed `POST /api/totes` to `POST /api/tote` (singular)
-  - Changed `PUT /api/totes/:id` to `PUT /api/tote/:id` (singular)
-  - These now match the web UI and backend
+**Solution:**
+- Track MIME types when picking images using XFile.mimeType
+- Convert to data URI format: `data:image/jpeg;base64,{base64data}`
+- Update both createTote() and addImagesToTote() methods
+- Send image_paths and image_types arrays matching backend API
 
 **Verification:**
-- ✅ List totes works
-- ✅ Create tote works (without images)
-- ✅ Update tote text works
-- ❌ Add images still broken (Issue #1)
+- ✅ Create tote with images saves correctly
+- ✅ Add images to existing tote works
+- ✅ Images appear in mobile app
+- ✅ Images appear in web UI
+- ✅ Images persist in database
 
-### Issue #3: App Crashes/Instability
+### ~~Issue #2: Delete Tote Error~~ ✅ FIXED
 
-**Status**: ⚠️ MONITORING  
-**Priority**: MEDIUM  
-**Affects**: General stability
+**Status**: ✅ RESOLVED  
+**Priority**: HIGH  
+**Fixed**: 2026-02-17
 
-**Reported Issues:**
-- App crashes after running for a while
-- App crashes when updating tote with images
-- Socket errors when submitting large images
+**Problem:**
+- Delete appeared to fail with error message
+- Tote was actually deleted on backend but mobile showed error
+- Home screen didn't refresh properly
 
-**Potential Causes:**
-1. Memory leaks from large image data
-2. Timeout issues with slow network
-3. Unhandled exceptions in async code
-4. State management issues
+**Solution:**
+- Backend returns 204 No Content on successful delete
+- Updated mobile to accept both 200 OK and 204 No Content
+- Home screen now properly refreshes after delete
 
-**Current Mitigations:**
-- Added 30-second timeout to API requests
-- Added try-catch blocks with error messages
-- Separated image upload from tote update
+**Verification:**
+- ✅ Delete works without error
+- ✅ Success message appears
+- ✅ Returns to home screen
+- ✅ Home screen refreshes
+- ✅ Tote removed from web UI
 
-**Still Needed:**
-- Implement image compression before upload
-- Add better error handling and user feedback
-- Add loading indicators during image uploads
-- Implement retry logic for failed uploads
+### ~~Issue #3: Create Endpoint Wrong~~ ✅ FIXED
+
+**Status**: ✅ RESOLVED  
+**Priority**: HIGH  
+**Fixed**: 2026-02-17
+
+**Problem:**
+- Create tote failed with 404 error
+- Using wrong endpoint /api/totes (plural)
+
+**Solution:**
+- Changed to /api/tote (singular) to match backend
+
+**Verification:**
+- ✅ Create tote works with and without images
 
 ## Backend Connection
 
