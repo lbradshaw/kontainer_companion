@@ -4,6 +4,7 @@ import '../services/api_service.dart';
 import '../utils/theme.dart';
 import 'settings_screen.dart';
 import 'scan_screen.dart';
+import 'search_screen.dart';
 import 'tote_detail_screen.dart';
 import 'tote_view_screen.dart';
 
@@ -56,6 +57,16 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Kontainer'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: 'Search',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: 'Add New',
