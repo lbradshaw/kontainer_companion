@@ -1,7 +1,8 @@
 # ToteTrax Mobile - Current Session Progress & Known Issues
 
-**Last Updated**: 2026-02-17  
+**Last Updated**: 2026-02-17 20:39 UTC  
 **Session Context**: Development of ToteTrax Mobile companion app
+**Current Version**: v0.5.0
 
 ## Project Overview
 
@@ -30,7 +31,8 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 
 3. **Screens Implemented**
    - Home screen with tote list
-   - Add tote screen with form
+   - Add tote screen with form (deprecated)
+   - **Tote view screen (read-only details)** ✅ NEW v0.5.0
    - Tote detail/edit screen with camera/image picker
    - Settings screen (placeholder)
    - **QR code scanner (fully functional)**
@@ -152,6 +154,31 @@ ToteTrax Mobile is a Flutter-based mobile companion app for the ToteTrax storage
 - ✅ Add multiple gallery images works
 - ✅ Camera images still work
 - ✅ Mix of camera and gallery images works
+
+## Recent Updates (v0.5.0 - 2026-02-17)
+
+### ✅ View/Edit Screen Separation
+
+**Implemented**: Read-only view screen with edit button
+
+**Changes:**
+- Created `ToteViewScreen` for viewing tote details (read-only)
+- `ToteDetailScreen` now dedicated to editing (create/update)
+- Updated navigation flow:
+  - Home screen → Tap tote → View screen
+  - View screen → Tap Edit button → Edit screen
+  - QR scanner → View screen
+  
+**Benefits:**
+- Prevents accidental edits when viewing totes
+- Cleaner separation of concerns
+- Better UX - intentional edit action required
+- Edit and Delete buttons both accessible from view screen
+
+**Files Modified:**
+- `lib/screens/tote_view_screen.dart` (NEW)
+- `lib/screens/home_screen.dart` (navigation update)
+- `lib/screens/scan_screen.dart` (navigation update)
 
 ## Backend Connection
 
@@ -374,56 +401,45 @@ flutter run             # For connected Android/iOS device
 - **Backend Docs**: `D:\projects\totetrax\TECHNICAL-DOCS.md`
 - **This File**: `D:\projects\totetrax_mobile\SESSION-PROGRESS.md`
 
+## Known Minor Issues
+
+### Lint Warnings (Non-Critical)
+
+**Status**: ⚠️ MINOR  
+**Priority**: LOW
+
+**Current Warnings:**
+1. `avoid_print` - lib\models\tote.dart:52 - Debug print statement in production code
+2. `use_super_parameters` - tote_detail_screen.dart:11 - Old-style constructor parameter syntax
+3. `prefer_final_fields` - tote_detail_screen.dart:27 - _deletedImageIds could be final
+4. `use_super_parameters` - tote_view_screen.dart:11 - Old-style constructor parameter syntax
+
+**Impact**: None - These are style/best practice suggestions, not functional issues
+
+**Fix**: Can be addressed in future cleanup session
+
 ## Next Session TODO
 
-### Immediate Priorities (Fix Broken Features)
+### Immediate Priorities
 
-1. **🔥 FIX IMAGE UPLOAD** (Critical)
-   - [ ] Debug mobile app image upload request format
-   - [ ] Compare to working web UI implementation
-   - [ ] Check backend logs for request details
-   - [ ] Test with curl/Postman to isolate issue
-   - [ ] Fix mobile app to send correct format
-   - [ ] Test create tote with images
-   - [ ] Test add images to existing tote
-
-2. **Test Coverage**
-   - [ ] Test delete tote functionality
-   - [ ] Test viewing images in tote detail
-   - [ ] Test with real Android device
+1. **Polish & Refinement**
+   - [ ] Fix lint warnings (optional cleanup)
+   - [ ] Test on real Android device
    - [ ] Test with large images (compression needed?)
-
-3. **Image Display**
-   - [ ] Implement image display in tote detail screen
-   - [ ] Show thumbnail in tote list card (optional)
-   - [ ] Handle base64 data URI from backend
-   - [ ] Add loading states for images
-
-### Future Enhancements
-
-4. **Camera Integration**
-   - [ ] Add image_picker dependency
-   - [ ] Implement camera capture
-   - [ ] Implement gallery selection
    - [ ] Add image compression before upload
+   - [ ] Show thumbnail in tote list card (optional)
 
-5. **QR Scanner**
-   - [ ] Implement mobile_scanner on scan screen
-   - [ ] Request camera permissions
-   - [ ] Parse scanned QR codes
-   - [ ] Navigate to tote details
-
-6. **Offline Support**
+2. **Offline Support**
    - [ ] Implement local caching with sqflite
    - [ ] Sync when online
    - [ ] Handle conflicts
 
-7. **Settings Persistence**
+3. **Settings Persistence**
    - [ ] Save server URL to shared_preferences
    - [ ] Add dark mode toggle
    - [ ] Save theme preference
 
-8. **Polish**
+4. **Additional Features**
    - [ ] Add pull-to-refresh on home screen
    - [ ] Add search/filter
    - [ ] Better error messages
@@ -522,7 +538,27 @@ Before ending session, verify:
 
 ---
 
+## Session Summary (2026-02-17)
+
+### Completed This Session
+1. ✅ Fixed gallery image RangeError when updating totes (v0.4.1)
+2. ✅ Implemented view/edit screen separation (v0.5.0)
+3. ✅ Updated navigation flow for better UX
+4. ✅ Updated all documentation
+
+### Current Status
+- **All core features working**: CRUD, images, QR scanning, camera/gallery
+- **All critical bugs fixed**: Images upload correctly, delete works, gallery images work
+- **UX improved**: Separate view and edit modes prevent accidental changes
+- **Code quality**: Passes flutter analyze (4 minor style warnings)
+
+### For Next Session
+- Optional: Clean up lint warnings
+- Consider: Image compression for large photos
+- Consider: Settings persistence with shared_preferences
+- Consider: Offline caching with sqflite
+
 **End of Session Progress Document**
 
-*Last Updated: 2026-02-16*  
-*Next Session: Focus on fixing image upload functionality*
+*Last Updated: 2026-02-17 20:39 UTC*  
+*Next Session: Polish and optional enhancements*
