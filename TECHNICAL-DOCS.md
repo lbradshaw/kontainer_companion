@@ -47,6 +47,7 @@ totetrax_mobile/
 │   │   ├── tote_view_screen.dart  # View kontainer details (read-only)
 │   │   ├── tote_detail_screen.dart # Edit kontainer (create/update)
 │   │   ├── scan_screen.dart        # QR code scanner
+│   │   ├── search_screen.dart      # Search kontainers by name/items
 │   │   └── settings_screen.dart    # Server configuration
 │   ├── services/              # Business logic
 │   │   └── api_service.dart   # Backend API communication
@@ -136,15 +137,16 @@ Matches Kontainer web application design:
 
 #### Home Screen
 - AppBar with "Kontainer" title
-- Action buttons: Add New (+), Scan (QR), Settings
+- Action buttons: Refresh, Search, Add New (+), Scan (QR), Settings
 - List of kontainer cards showing:
   - Kontainer name (bold/large)
   - First 3 lines of items
 - Tap card to view kontainer details
 - Pull-to-refresh functionality
+- Manual refresh button to sync with backend
 - Loading spinner when fetching data
 - Error state with retry button
-- Empty state message
+- Empty state message (no error when database is empty)
 
 #### Kontainer View Screen (Read-Only)
 - View kontainer details without editing
@@ -176,6 +178,16 @@ Matches Kontainer web application design:
 - Legacy screen, functionality moved to Kontainer Detail Screen
 - May be removed in future version
 
+#### Search Screen
+- Search kontainers by name or items
+- Real-time search input with clear button
+- Search button and Enter key to search
+- Results displayed in card list format
+- Shows count of matching kontainers
+- Tap result to view kontainer details
+- Empty state when no matches found
+- Pre-search state with helpful message
+
 #### Settings Screen
 - Server URL configuration
 - Save button with confirmation
@@ -201,6 +213,8 @@ Matches Kontainer web application design:
 - API service with full CRUD operations including image management
 - QR code lookup API endpoint (`getToteByQRCode`)
 - Home screen with kontainer list
+- **Refresh button on home screen** - Manual sync with backend
+- **Search functionality** - Search by name or items
 - Add kontainer screen with form validation
 - Kontainer detail/edit screen with:
   - Name and items editing
@@ -220,6 +234,7 @@ Matches Kontainer web application design:
 - Camera permissions (Android + iOS)
 - Pull-to-refresh
 - Error handling and loading states
+- **Null/empty list handling** - No error on empty database
 - Navigation between screens
 - Responsive Material Design UI
 - Image picker integration (camera + gallery)
@@ -229,10 +244,10 @@ Matches Kontainer web application design:
 ### 🚧 Planned/Future
 - ~~Fix image upload (critical - images not saving to backend)~~ ✅ FIXED v0.4.0
 - ~~Fix delete kontainer error~~ ✅ FIXED v0.4.0
+- ~~Search and filter functionality~~ ✅ ADDED v0.6.0
 - Server connectivity testing
 - Shared preferences for settings persistence
 - Offline support with local caching
-- Search and filter functionality
 - Dark mode toggle in settings
 - Export/import data
 - Image compression for large photos
@@ -260,11 +275,33 @@ Matches Kontainer web application design:
 
 ### Data Synchronization
 - Mobile app fetches fresh data on screen load
+- Manual refresh button to sync changes from other apps
+- Pull-to-refresh gesture for quick updates
 - Changes made via web UI are reflected immediately when details screen is opened
 - No local caching to avoid stale data issues
 - All kontainer updates are synchronized in real-time
 
 ## Version History
+
+- **v0.6.0** (Feb 2026) - Kontainer Rebrand & Search
+  - **Rebranded from ToteTrax to Kontainer**
+    - All user-facing text updated to "Kontainer"
+    - Package name: totetrax_mobile → kontainer_mobile
+    - Updated Android and iOS app labels
+    - Documentation fully updated
+  - **NEW: Search functionality**
+    - Search screen with name/items filtering
+    - Real-time search results
+    - Result count display
+    - Clear button and empty states
+  - **NEW: Refresh button on home screen**
+    - Manual sync button in AppBar
+    - Disabled while loading
+    - Works alongside pull-to-refresh
+  - **FIXED: Empty database error**
+    - No longer shows type error when no kontainers exist
+    - Gracefully handles null/empty API responses
+    - Shows friendly empty state message
 
 - **v0.5.0** (Feb 2026) - View/Edit Screen Separation
   - **NEW: Separate view and edit screens**

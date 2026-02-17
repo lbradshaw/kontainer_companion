@@ -1,8 +1,8 @@
 # Kontainer Mobile - Current Session Progress & Known Issues
 
-**Last Updated**: 2026-02-17 20:39 UTC  
+**Last Updated**: 2026-02-17 22:09 UTC  
 **Session Context**: Development of Kontainer Mobile companion app
-**Current Version**: v0.5.0
+**Current Version**: v0.6.0
 
 ## Project Overview
 
@@ -30,16 +30,18 @@ Kontainer Mobile is a Flutter-based mobile companion app for the Kontainer stora
    - Responsive layout
 
 3. **Screens Implemented**
-   - Home screen with tote list
-   - Add tote screen with form (deprecated)
-   - **Tote view screen (read-only details)** ✅ NEW v0.5.0
-   - Tote detail/edit screen with camera/image picker
+   - Home screen with container list
+   - **Refresh button** - Manual sync with backend ✅ NEW v0.6.0
+   - **Search screen** - Search by name or items ✅ NEW v0.6.0
+   - Add container screen with form (deprecated)
+   - **Container view screen (read-only details)** ✅ NEW v0.5.0
+   - Container detail/edit screen with camera/image picker
    - Settings screen (placeholder)
    - **QR code scanner (fully functional)**
 
 4. **API Integration**
    - `ApiService` class with full CRUD operations
-   - GET /api/totes (list all)
+   - GET /api/totes (list all) - **Now handles null/empty responses** ✅ FIXED v0.6.0
    - GET /api/tote/:id (get single)
    - **GET /api/tote/qr/:qrCode (lookup by QR code)** ✅ NEW
    - POST /api/tote (create new)
@@ -155,7 +157,55 @@ Kontainer Mobile is a Flutter-based mobile companion app for the Kontainer stora
 - ✅ Camera images still work
 - ✅ Mix of camera and gallery images works
 
-## Recent Updates (v0.5.0 - 2026-02-17)
+## Recent Updates (v0.6.0 - 2026-02-17)
+
+### ✅ Kontainer Rebrand
+
+**Implemented**: Complete rebrand from ToteTrax to Kontainer
+
+**Changes:**
+- Package name: `totetrax_mobile` → `kontainer_mobile`
+- All user-facing text: "ToteTrax/Tote" → "Kontainer"
+- Android app label: "Kontainer"
+- iOS camera permission: Updated to reference "kontainers"
+- Documentation: README, TECHNICAL-DOCS, SESSION-PROGRESS fully updated
+- Preserved internal code structure and backend API references
+
+### ✅ Search Functionality
+
+**Implemented**: Search screen for finding kontainers
+
+**Features:**
+- Search by kontainer name or items
+- Real-time search input with clear button
+- Result count display
+- Card list format matching home screen
+- Tap to view kontainer details
+- Empty states for no results and pre-search
+
+**Files Created:**
+- `lib/screens/search_screen.dart` (NEW)
+
+**Files Modified:**
+- `lib/screens/home_screen.dart` (added search button)
+
+### ✅ Refresh Button & Empty Database Fix
+
+**Implemented**: Manual refresh and proper empty state handling
+
+**Features:**
+- Refresh icon button in home screen AppBar
+- Button disabled while loading
+- Works alongside pull-to-refresh
+- Fixed null/empty list error from backend
+- No error shown when database is empty
+- Friendly empty state message
+
+**Files Modified:**
+- `lib/services/api_service.dart` (null handling)
+- `lib/screens/home_screen.dart` (refresh button)
+
+## Recent Updates (v0.5.0 - 2026-02-17 Earlier)
 
 ### ✅ View/Edit Screen Separation
 
@@ -541,26 +591,51 @@ Before ending session, verify:
 ## Session Summary (2026-02-17)
 
 ### Completed This Session
-1. ✅ Fixed gallery image RangeError when updating containers (v0.4.1)
-2. ✅ Implemented view/edit screen separation (v0.5.0)
-3. ✅ Updated navigation flow for better UX
-4. ✅ Updated all documentation
-5. ✅ Rebranded app from ToteTrax to Kontainer
+1. ✅ Fixed gallery image RangeError when updating containers (v0.4.1 - earlier)
+2. ✅ Implemented view/edit screen separation (v0.5.0 - earlier)
+3. ✅ **Rebranded app from ToteTrax to Kontainer (v0.6.0)**
+   - Package name changed to kontainer_mobile
+   - All UI text updated to "Kontainer"
+   - Documentation fully updated
+4. ✅ **Added search functionality (v0.6.0)**
+   - Search by name or items
+   - Search screen with results display
+   - Search button in AppBar
+5. ✅ **Added refresh button to home screen (v0.6.0)**
+   - Manual sync with backend
+   - Disabled while loading
+6. ✅ **Fixed empty database error (v0.6.0)**
+   - No type error when database is empty
+   - Proper null/empty list handling
+   - Friendly empty state message
 
 ### Current Status
-- **All core features working**: CRUD, images, QR scanning, camera/gallery
-- **All critical bugs fixed**: Images upload correctly, delete works, gallery images work
-- **UX improved**: Separate view and edit modes prevent accidental changes
+- **Version**: v0.6.0 (Kontainer rebrand release)
+- **All core features working**: CRUD, images, QR scanning, camera/gallery, search
+- **All critical bugs fixed**: Images upload correctly, delete works, gallery images work, empty DB handled
+- **UX improved**: 
+  - Separate view and edit modes prevent accidental changes
+  - Search functionality for finding kontainers
+  - Manual refresh button for syncing
+  - Better empty states
 - **Code quality**: Passes flutter analyze (4 minor style warnings)
-- **Branding**: Updated to Kontainer across all user-facing documentation
+- **Branding**: Fully rebranded to Kontainer
+
+### Git Commits (refactor branch)
+- `b6965dc` - Add refresh button to home screen
+- `ea84ceb` - Fix null/empty list handling in getTotes API
+- `7e80a60` - Add search functionality for kontainers
+- `80c94f0` - Rebrand app from ToteTrax to Kontainer
+- `838c8ba` - Update session progress notes for v0.5.0 (master branch)
 
 ### For Next Session
 - Optional: Clean up lint warnings
 - Consider: Image compression for large photos
 - Consider: Settings persistence with shared_preferences
 - Consider: Offline caching with sqflite
+- Consider: Merge refactor branch to master
 
 **End of Session Progress Document**
 
-*Last Updated: 2026-02-17 20:39 UTC*  
-*Next Session: Polish and optional enhancements*
+*Last Updated: 2026-02-17 22:09 UTC*  
+*Next Session: Merge refactor branch, optional polish and enhancements*
