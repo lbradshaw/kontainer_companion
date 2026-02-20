@@ -144,6 +144,13 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
       if (index < _imageIds.length && _imageIds[index] > 0) {
         _deletedImageIds.add(_imageIds[index]);
         _imageIds.removeAt(index);
+      } else {
+        // This is a new image (not yet saved to backend)
+        // Calculate its index in _imageMimeTypes (after existing images)
+        final mimeTypeIndex = index - _originalImageCount;
+        if (mimeTypeIndex >= 0 && mimeTypeIndex < _imageMimeTypes.length) {
+          _imageMimeTypes.removeAt(mimeTypeIndex);
+        }
       }
       _images.removeAt(index);
     });
@@ -223,6 +230,9 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
 
     try {
       if (_isEditing) {
+        // Track deleted count before clearing
+        final deletedCount = _deletedImageIds.length;
+        
         // First, delete any removed images
         if (_deletedImageIds.isNotEmpty) {
           for (final imageId in _deletedImageIds) {
@@ -242,11 +252,12 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
         );
         await _apiService.updateTote(toteUpdate);
         
-        // Add new images separately (those not in original tote)
-        if (_images.length > _originalImageCount) {
-          final newImages = _images.sublist(_originalImageCount);
-          // _imageMimeTypes only contains MIME types for NEW images (not existing ones)
-          // So we use it directly without sublist
+        // Add new images separately if any were added
+        // _imageMimeTypes only contains MIME types for NEW images (not existing ones)
+        if (_imageMimeTypes.isNotEmpty) {
+          // Get only the new images (those added after loading)
+          final startIndex = _originalImageCount - deletedCount;
+          final newImages = _images.sublist(startIndex);
           await _apiService.addImagesToTote(widget.tote!.id, newImages, _imageMimeTypes);
         }
         
