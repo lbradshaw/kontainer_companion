@@ -12,6 +12,7 @@ class ApiService {
     return prefs.getString('server_url') ?? 'http://localhost:3818';
   }
 
+  // Get top-level containers only (for main list)
   Future<List<Tote>> getTotes() async {
     final url = await _getBaseUrl();
     final response = await http.get(Uri.parse('$url/api/totes'));
@@ -32,6 +33,30 @@ class ApiService {
       return decoded.map<Tote>((json) => Tote.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load totes');
+    }
+  }
+
+  // Get ALL containers including sub-containers (for search)
+  Future<List<Tote>> getTotesAll() async {
+    final url = await _getBaseUrl();
+    final response = await http.get(Uri.parse('$url/api/totes/all'));
+    
+    if (response.statusCode == 200) {
+      // Handle empty or null response
+      if (response.body.isEmpty || response.body == 'null') {
+        return [];
+      }
+      
+      final decoded = json.decode(response.body);
+      
+      // If null or not a list, return empty list
+      if (decoded == null || decoded is! List) {
+        return [];
+      }
+      
+      return decoded.map<Tote>((json) => Tote.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load all totes');
     }
   }
 
@@ -59,13 +84,18 @@ class ApiService {
     }
   }
 
-  Future<Tote> createTote(Tote tote, {List<String>? imageMimeTypes}) async {
+  Future<Tote> createTote(Tote tote, {List<String>? imageMimeTypes, int? parentId}) async {
     final url = await _getBaseUrl();
     final Map<String, dynamic> body = {
       'name': tote.name,
       'items': tote.items,
       'location': tote.location ?? '',
     };
+    
+    // Add parent_id if creating a sub-container
+    if (parentId != null) {
+      body['parent_id'] = parentId;
+    }
     
     // Add images in data URI format if provided
     if (tote.images.isNotEmpty) {

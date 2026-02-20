@@ -9,6 +9,9 @@ class Tote {
   final String? qrCode;
   final List<Uint8List> images;
   final List<int> imageIds;
+  final int? parentId;
+  final int depth;
+  final List<Tote>? children;
 
   Tote({
     required this.id,
@@ -18,6 +21,9 @@ class Tote {
     this.qrCode,
     this.images = const [],
     this.imageIds = const [],
+    this.parentId,
+    this.depth = 0,
+    this.children,
   });
 
   factory Tote.fromJson(Map<String, dynamic> json) {
@@ -57,6 +63,14 @@ class Tote {
       }
     }
     
+    // Parse children if present
+    List<Tote>? childrenList;
+    if (json['children'] != null && json['children'] is List) {
+      childrenList = (json['children'] as List)
+          .map((child) => Tote.fromJson(child))
+          .toList();
+    }
+    
     return Tote(
       id: json['id'],
       name: json['name'],
@@ -65,6 +79,9 @@ class Tote {
       qrCode: json['qr_code'],
       images: imagesList,
       imageIds: imageIdsList,
+      parentId: json['parent_id'],
+      depth: json['depth'] ?? 0,
+      children: childrenList,
     );
   }
 
@@ -75,6 +92,8 @@ class Tote {
       'items': items,
       'location': location ?? '',
       'qr_code': qrCode,
+      'parent_id': parentId,
+      'depth': depth,
     };
   }
 

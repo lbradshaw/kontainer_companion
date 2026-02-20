@@ -7,8 +7,9 @@ import '../utils/theme.dart';
 
 class ToteDetailScreen extends StatefulWidget {
   final Tote? tote;
+  final int? parentId; // For creating sub-containers
 
-  const ToteDetailScreen({Key? key, this.tote}) : super(key: key);
+  const ToteDetailScreen({Key? key, this.tote, this.parentId}) : super(key: key);
 
   @override
   State<ToteDetailScreen> createState() => _ToteDetailScreenState();
@@ -29,6 +30,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
   bool _isLoading = false;
   bool _isEditing = false;
   int _originalImageCount = 0;
+  Tote? _parentTote; // Store parent info when creating sub-container
 
   @override
   void initState() {
@@ -36,6 +38,23 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
     if (widget.tote != null) {
       _loadToteData();
       _isEditing = true;
+    } else if (widget.parentId != null) {
+      _loadParentData();
+    }
+  }
+
+  Future<void> _loadParentData() async {
+    try {
+      final parent = await _apiService.getTote(widget.parentId!);
+      setState(() {
+        _parentTote = parent;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading parent: $e')),
+        );
+      }
     }
   }
 
@@ -283,7 +302,11 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
           qrCode: '',
           images: _images,
         );
-        await _apiService.createTote(tote, imageMimeTypes: _imageMimeTypes);
+        await _apiService.createTote(
+          tote,
+          imageMimeTypes: _imageMimeTypes,
+          parentId: widget.parentId,
+        );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Kontainer created successfully')),
@@ -373,7 +396,11 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.cardColor,
-        title: Text(_isEditing ? 'Edit Kontainer' : 'New Kontainer'),
+        title: Text(
+          _isEditing
+              ? 'Edit Kontainer'
+              : (widget.parentId != null ? 'New Sub-Container' : 'New Kontainer')
+        ),
         actions: [
           if (_isEditing)
             IconButton(
@@ -391,6 +418,46 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Parent breadcrumb for sub-container creation
+                    if (widget.parentId != null && _parentTote != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE3F2FD),
+                          borderRadius: BorderRadius.circular(8),
+                          border: const Border(
+                            left: BorderSide(color: Color(0xFF2196F3), width: 4),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Creating Sub-Container for:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: AppTheme.textSecondaryColor,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            InkWell(
+                              onTap: () => Navigator.pop(context),
+                              child: Text(
+                                '← ${_parentTote!.name} (${_parentTote!.qrCode})',
+                                style: const TextStyle(
+                                  color: Color(0xFF2196F3),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+
                     TextFormField(
                       controller: _nameController,
                       style: const TextStyle(color: AppTheme.textColor),
@@ -555,6 +622,38 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
                         },
                       ),
                     const SizedBox(height: 24),
+                    
+                    // Add Sub-Container button (only when editing a top-level container)
+                    if (_isEditing && widget.tote != null && widget.tote!.depth == 0) ...[
+                      OutlinedButton.icon(
+                        onPressed: _isLoading ? null : () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ToteDetailScreen(
+                                parentId: widget.tote!.id,
+                              ),
+                            ),
+                          );
+                          if (result == true) {
+                            // Optionally reload to show updated children count
+                            _loadToteData();
+                          }
+                        },
+                        icon: const Icon(Icons.add),
+                        label: const Text('Add Sub-Container'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.accentColor,
+                          side: const BorderSide(color: AppTheme.accentColor),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                    
                     ElevatedButton(
                       onPressed: _isLoading ? null : _saveTote,
                       style: ElevatedButton.styleFrom(

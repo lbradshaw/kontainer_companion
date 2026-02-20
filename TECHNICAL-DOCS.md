@@ -72,9 +72,10 @@ totetrax_mobile/
 
 The mobile app communicates with the Kontainer backend server:
 
-- `GET /api/totes` - List all kontainers
-- `GET /api/totes/:id` - Get kontainer details with images
-- `POST /api/totes` - Create new kontainer
+- `GET /api/totes` - List top-level kontainers only (depth=0)
+- `GET /api/totes/all` - List all kontainers including sub-containers (for search)
+- `GET /api/totes/:id` - Get kontainer details with images and children
+- `POST /api/totes` - Create new kontainer (accepts optional parent_id)
 - `PUT /api/totes/:id` - Update kontainer name and items
 - `POST /api/totes/:id/add-image` - Add image(s) to kontainer
 - `DELETE /api/totes/:id/image/:imageId` - Delete specific image from kontainer
@@ -90,7 +91,11 @@ class Tote {
   final String items;       // Newline-separated item list
   final String? location;   // Physical storage location (optional)
   final String? qrCode;     // Base64 data URI for QR code image
-  final List<ToteImage> images; // List of images stored in database
+  final List<Uint8List> images; // List of images stored in database
+  final List<int> imageIds; // Image IDs from backend
+  final int? parentId;      // Parent container ID (null for top-level)
+  final int depth;          // Nesting level: 0=top-level, 1=sub-container
+  final List<Tote>? children; // Sub-containers (for parent containers)
   
   // Helper method to show first 3 lines of items
   String getPreviewItems() {
@@ -98,12 +103,6 @@ class Tote {
     if (lines.length <= 3) return items;
     return '${lines.take(3).join('\n')}...';
   }
-}
-
-class ToteImage {
-  final int id;
-  final String data;  // Base64 encoded image data
-  bool markedForDeletion = false; // UI flag for deletion
 }
 ```
 
@@ -139,9 +138,10 @@ Matches Kontainer web application design:
 #### Home Screen
 - AppBar with "Kontainer" title
 - Action buttons: Refresh, Search, Add New (+), Scan (QR), Settings
-- List of kontainer cards showing:
+- List of **top-level kontainer cards only** (depth=0) showing:
   - Kontainer name (bold/large)
   - First 3 lines of items
+  - **Sub-container count badge** (green) if has children
 - Tap card to view kontainer details
 - Pull-to-refresh functionality
 - Manual refresh button to sync with backend
@@ -152,18 +152,25 @@ Matches Kontainer web application design:
 #### Kontainer View Screen (Read-Only)
 - View kontainer details without editing
 - AppBar with Edit and Delete buttons
+- **Parent breadcrumb** for sub-containers (depth=1) - always navigates to parent container view (loads fresh parent data)
+- **Sub-container indicator badge** (orange) for depth=1 containers
 - Display sections:
   - Kontainer name (large, bold)
   - Location (with 📍 icon, if set)
   - Items list (full text)
-  - QR code (if available)
+  - QR code (only for top-level containers, hidden for sub-containers)
   - Images grid (tap for full-size view)
+  - **Sub-containers list** (only for top-level, below images) - text-only list with icons, names, QR codes
+  - **"Add Sub-Container" button** (only for top-level containers, below sub-containers list)
 - Pull-to-refresh to sync with server
 - Edit button navigates to edit screen
 - Delete button with confirmation dialog
 
 #### Kontainer Detail Screen (Create/Edit)
-- Form for creating new kontainers or editing existing ones
+- Form for creating new kontainers, sub-containers, or editing existing ones
+- **Parent breadcrumb** when creating sub-container (shows parent name/QR)
+- **Title changes**: "New Kontainer" / "New Sub-Container" / "Edit Kontainer"
+- **"Add Sub-Container" button** when editing a top-level container (depth=0)
 - Fields:
   - Kontainer Name text field (required)
   - Location text field (optional) with location icon
@@ -183,9 +190,12 @@ Matches Kontainer web application design:
 
 #### Search Screen
 - Search kontainers by name or items
+- **Searches ALL containers** including sub-containers (uses /api/totes/all)
 - Real-time search input with clear button
 - Search button and Enter key to search
-- Results displayed in card list format
+- Results displayed in card list format with:
+  - **Orange "📦 Sub" badge** for sub-containers (depth=1)
+  - Kontainer name and preview items
 - Shows count of matching kontainers
 - Tap result to view kontainer details
 - Empty state when no matches found
@@ -212,12 +222,13 @@ Matches Kontainer web application design:
 ### ✅ Completed
 - Project scaffolding
 - Theme system matching Kontainer web
-- Data models (Tote, ToteImage)
+- Data models with hierarchical support (parent_id, depth, children)
 - API service with full CRUD operations including image management
+- getTotesAll() endpoint for searching all containers
 - QR code lookup API endpoint (`getToteByQRCode`)
-- Home screen with kontainer list
+- Home screen with top-level kontainer list and sub-container badges
 - **Refresh button on home screen** - Manual sync with backend
-- **Search functionality** - Search by name or items
+- **Search functionality** - Search across ALL containers (parent + sub)
 - Add kontainer screen with form validation
 - Kontainer detail/edit screen with:
   - Name and items editing
@@ -226,6 +237,13 @@ Matches Kontainer web application design:
   - Full-size image viewer
   - Auto-refresh on load
   - Delete kontainer functionality
+- **Hierarchical sub-containers support**:
+  - Parent breadcrumb navigation for sub-containers
+  - Sub-container indicator badges
+  - Sub-containers grid display on parent view
+  - "Add Sub-Container" button (top-level only)
+  - QR codes hidden for sub-containers
+  - Create sub-containers with parent_id parameter
 - Settings screen (basic server URL)
 - **QR code scanner (fully functional)**:
   - Real-time camera scanning
@@ -285,6 +303,34 @@ Matches Kontainer web application design:
 - All kontainer updates are synchronized in real-time
 
 ## Version History
+
+- **v0.8.0** (Feb 2026) - Hierarchical Sub-Containers Support
+  - **NEW: 2-level hierarchical container support**
+    - Added parent_id, depth, and children fields to Tote model
+    - Home screen now shows only top-level containers (depth=0)
+    - Green badge shows sub-container count on parent cards
+    - Search functionality searches ALL containers (parents + subs)
+    - Orange "📦 Sub" badge on sub-containers in search results
+  - **View Screen enhancements**:
+    - Parent breadcrumb for sub-containers always navigates to parent (works from any entry point)
+    - Sub-container indicator badge (orange) for depth=1
+    - Sub-containers displayed as text-only list below parent images
+    - "Add Sub-Container" button below sub-containers list
+    - QR code hidden for sub-containers (depth=1)
+  - **Create/Edit Screen enhancements**:
+    - Support for parent_id parameter to create sub-containers
+    - Parent breadcrumb when creating sub-container
+    - Dynamic title: "New Sub-Container" vs "New Kontainer"
+    - "Add Sub-Container" button when editing a top-level container
+  - **API updates**:
+    - New getTotesAll() method for searching all containers
+    - Modified getTotes() returns only top-level (depth=0)
+    - createTote() accepts optional parentId parameter
+  - **Backend compatibility**: Requires Kontainer backend v1.8.0+
+  - **Color scheme**: Matches web UI design
+    - Green (#4CAF50) for sub-container count badges
+    - Orange (#FF9800) for sub-container indicators
+    - Blue (#2196F3) for breadcrumb links
 
 - **v0.7.0** (Feb 2026) - Location Field Support
   - **NEW: Location field for kontainers**

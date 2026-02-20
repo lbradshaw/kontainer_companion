@@ -175,6 +175,82 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Parent breadcrumb for sub-containers
+                    if (_currentTote.depth == 1 && _currentTote.parentId != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF0F0F0),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: InkWell(
+                          onTap: () async {
+                            // Always navigate to parent container, regardless of navigation stack
+                            try {
+                              final parent = await _apiService.getTote(_currentTote.parentId!);
+                              if (mounted) {
+                                // Pop current screen first, then push parent to avoid stack buildup
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ToteViewScreen(tote: parent),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Error loading parent: $e')),
+                                );
+                              }
+                            }
+                          },
+                          child: const Row(
+                            children: [
+                              Icon(Icons.arrow_back, color: Color(0xFF2196F3), size: 18),
+                              SizedBox(width: 8),
+                              Text(
+                                'Back to Parent Container',
+                                style: TextStyle(
+                                  color: Color(0xFF2196F3),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+
+                    // Sub-container indicator for depth=1
+                    if (_currentTote.depth == 1) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF9800).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFFF9800)),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '📦 Sub-Container',
+                              style: TextStyle(
+                                color: Color(0xFFFF9800),
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+
                     // Tote Name
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -284,8 +360,8 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // QR Code (if available)
-                    if (_currentTote.qrCode != null && _currentTote.qrCode!.isNotEmpty) ...[
+                    // QR Code (only for top-level containers, depth=0)
+                    if (_currentTote.depth == 0 && _currentTote.qrCode != null && _currentTote.qrCode!.isNotEmpty) ...[
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -369,6 +445,104 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                           );
                         },
                       ),
+                    
+                    // Sub-Containers Section (only for top-level containers) - Text list below images
+                    if (_currentTote.depth == 0 && _currentTote.children != null && _currentTote.children!.isNotEmpty) ...[
+                      const SizedBox(height: 24),
+                      const Text(
+                        'Sub-Containers',
+                        style: TextStyle(
+                          color: AppTheme.accentColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${_currentTote.children!.length} sub-container${_currentTote.children!.length == 1 ? '' : 's'}',
+                        style: const TextStyle(
+                          color: AppTheme.textSecondaryColor,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: AppTheme.cardColor,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppTheme.borderColor),
+                        ),
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _currentTote.children!.length,
+                          separatorBuilder: (context, index) => const Divider(height: 1),
+                          itemBuilder: (context, index) {
+                            final child = _currentTote.children![index];
+                            return ListTile(
+                              leading: const Icon(
+                                Icons.inventory_2,
+                                color: Color(0xFFFF9800),
+                              ),
+                              title: Text(
+                                child.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.textColor,
+                                ),
+                              ),
+                              subtitle: Text(
+                                child.qrCode ?? '',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppTheme.textSecondaryColor,
+                                  fontFamily: 'monospace',
+                                ),
+                              ),
+                              trailing: const Icon(Icons.chevron_right, color: AppTheme.textSecondaryColor),
+                              onTap: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ToteViewScreen(tote: child),
+                                  ),
+                                );
+                                if (result == true) {
+                                  _loadToteData();
+                                }
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+
+                    // Add Sub-Container button (only for top-level containers)
+                    if (_currentTote.depth == 0) ...[
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: _isLoading ? null : () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ToteDetailScreen(
+                                parentId: _currentTote.id,
+                              ),
+                            ),
+                          );
+                          if (result == true) {
+                            _loadToteData();
+                          }
+                        },
+                        icon: const Icon(Icons.add),
+                        label: const Text('Add Sub-Container'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.accentColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

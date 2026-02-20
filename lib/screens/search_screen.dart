@@ -34,8 +34,8 @@ class _SearchScreenState extends State<SearchScreen> {
     });
 
     try {
-      // Get all kontainers and filter locally
-      final allTotes = await _apiService.getTotes();
+      // Get ALL kontainers including sub-containers for search
+      final allTotes = await _apiService.getTotesAll();
       final queryLower = query.toLowerCase();
       
       final results = allTotes.where((tote) {
@@ -195,12 +195,36 @@ class _SearchScreenState extends State<SearchScreen> {
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: ListTile(
-                  title: Text(
-                    tote.name,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  title: Row(
+                    children: [
+                      // Show sub-container indicator for depth=1
+                      if (tote.depth == 1)
+                        Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFF9800),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            '📦 Sub',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      Expanded(
+                        child: Text(
+                          tote.name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   subtitle: Text(
                     tote.getPreviewItems(),
