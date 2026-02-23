@@ -31,6 +31,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
   bool _isEditing = false;
   int _originalImageCount = 0;
   Tote? _parentTote; // Store parent info when creating sub-container
+String? _defaultSubLocation; // Store default location for sub-container
 
   @override
   void initState() {
@@ -48,6 +49,20 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
       final parent = await _apiService.getTote(widget.parentId!);
       setState(() {
         _parentTote = parent;
+        // Set default location for sub-container
+        if (parent.name.isNotEmpty && (parent.location != null && parent.location!.isNotEmpty)) {
+          _defaultSubLocation = "${parent.name}/${parent.location}";
+        } else if (parent.name.isNotEmpty) {
+          _defaultSubLocation = parent.name;
+        } else if (parent.location != null && parent.location!.isNotEmpty) {
+          _defaultSubLocation = parent.location;
+        } else {
+          _defaultSubLocation = null;
+        }
+        // Set the location controller if not already set
+        if (_locationController.text.isEmpty && _defaultSubLocation != null) {
+          _locationController.text = _defaultSubLocation!;
+        }
       });
     } catch (e) {
       if (mounted) {
