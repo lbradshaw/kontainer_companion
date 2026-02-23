@@ -1,4 +1,9 @@
-# Kontainer Mobile
+# Kontainer Companion
+
+**This is the official companion mobile app for [Kontainer](https://github.com/lbradshaw/kontainer).**
+
+Kontainer Companion lets you manage your storage containers on the go, connecting directly to your Kontainer backend server.
+
 
 Companion mobile app for Kontainer storage container inventory management system.
 
@@ -64,11 +69,6 @@ flutter build apk
 flutter build appbundle
 ```
 
-### iOS
-```bash
-flutter build ios
-```
-
 ### Windows
 ```bash
 flutter build windows
@@ -83,6 +83,20 @@ flutter build linux
 ```bash
 flutter build macos
 ```
+
+### iOS
+```bash
+flutter build ios
+```
+
+#### iOS Distribution Notes
+- Building for iOS requires a Mac and Xcode.
+- You cannot freely distribute iOS binaries (IPA files) for public download due to Apple restrictions.
+- Sideloading is only possible for developers with an Apple Developer account ($99/year) and limited to personal devices.
+- TestFlight is Apple's beta distribution platform, but also requires a paid Developer account and App Store review.
+- There is currently no funding to distribute Kontainer Companion on TestFlight or the App Store.
+- If you want to run the app on your own iOS device, follow [Flutter's iOS deployment guide](https://docs.flutter.dev/deployment/ios) and note the limitations.
+- For most users, Android APK and Windows EXE are the recommended options.
 
 ## Configuration
 

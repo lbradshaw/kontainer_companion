@@ -9,8 +9,8 @@
 Kontainer Mobile is a Flutter-based mobile companion app for the Kontainer storage container inventory management system. It connects to the Kontainer Go backend server to provide mobile access to container inventory.
 
 **Related Projects:**
-- Backend: `D:\projects\totetrax` (Go + SQLite server)
-- Mobile: `D:\projects\totetrax_mobile` (Flutter app - this project, rebranded to Kontainer)
+- Backend: `D:\projects\kontainer` (Go + SQLite server)
+- Mobile: `D:\projects\kontainer_companion` (Flutter app - this project, rebranded to Kontainer)
 
 ## Current Development Status
 
@@ -192,7 +192,7 @@ Kontainer Mobile is a Flutter-based mobile companion app for the Kontainer stora
 **Implemented**: Complete rebrand from ToteTrax to Kontainer
 
 **Changes:**
-- Package name: `totetrax_mobile` → `kontainer_mobile`
+- Package name: `kontainer_companion`
 - All user-facing text: "ToteTrax/Tote" → "Kontainer"
 - Android app label: "Kontainer"
 - iOS camera permission: Updated to reference "kontainers"
@@ -434,8 +434,8 @@ flutter build apk --release
 ### Prerequisites
 1. Kontainer backend must be running:
    ```bash
-   cd D:\projects\totetrax
-   .\totetrax.exe
+   cd D:\projects\kontainer
+   .\kontainer.exe
    ```
    Server should start on `http://localhost:3818`
 
@@ -462,22 +462,22 @@ flutter run             # For connected Android/iOS device
 ## File Locations
 
 ### Mobile App Code
-- **Main Entry**: `D:\projects\totetrax_mobile\lib\main.dart`
-- **API Service**: `D:\projects\totetrax_mobile\lib\services\api_service.dart`
-- **Models**: `D:\projects\totetrax_mobile\lib\models\tote.dart`
-- **Screens**: `D:\projects\totetrax_mobile\lib\screens\*.dart`
-- **Theme**: `D:\projects\totetrax_mobile\lib\utils\theme.dart`
+- **Main Entry**: `D:\projects\kontainer_companion\lib\main.dart`
+- **API Service**: `D:\projects\kontainer_companion\lib\services\api_service.dart`
+- **Models**: `D:\projects\kontainer_companion\lib\models\tote.dart`
+- **Screens**: `D:\projects\kontainer_companion\lib\screens\*.dart`
+- **Theme**: `D:\projects\kontainer_companion\lib\utils\theme.dart`
 
 ### Backend Code (for reference)
-- **Main**: `D:\projects\totetrax\cmd\totetrax\main.go`
-- **Handlers**: `D:\projects\totetrax\internal\api\handlers.go`
-- **Service**: `D:\projects\totetrax\internal\service\tote_service.go`
-- **Models**: `D:\projects\totetrax\internal\models\tote.go`
+- **Main**: `D:\projects\kontainer\cmd\kontainer\main.go`
+- **Handlers**: `D:\projects\kontainer\internal\api\handlers.go`
+- **Service**: `D:\projects\kontainer\internal\service\tote_service.go`
+- **Models**: `D:\projects\kontainer\internal\models\tote.go`
 
 ### Documentation
-- **Mobile Docs**: `D:\projects\totetrax_mobile\TECHNICAL-DOCS.md`
-- **Backend Docs**: `D:\projects\totetrax\TECHNICAL-DOCS.md`
-- **This File**: `D:\projects\totetrax_mobile\SESSION-PROGRESS.md`
+- **Mobile Docs**: `D:\projects\kontainer_companion\TECHNICAL-DOCS.md`
+- **Backend Docs**: `D:\projects\kontainer\TECHNICAL-DOCS.md`
+- **This File**: `D:\projects\kontainer_companion\SESSION-PROGRESS.md`
 
 ## Known Minor Issues
 

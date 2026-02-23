@@ -6,7 +6,7 @@
 **Technology Stack**: Flutter (Dart)  
 **Purpose**: Mobile companion app for Kontainer storage container inventory management  
 **Created**: February 2026  
-**Repository**: D:\projects\totetrax_mobile
+**Repository**: D:\projects\kontainer_companion
 
 ## Architecture Overview
 
@@ -36,7 +36,7 @@ dependencies:
 ## Project Structure
 
 ```
-totetrax_mobile/
+kontainer_companion/
 ├── lib/
 │   ├── main.dart              # App entry point
 │   ├── models/                # Data models
@@ -347,7 +347,7 @@ Matches Kontainer web application design:
 - **v0.6.0** (Feb 2026) - Kontainer Rebrand & Search
   - **Rebranded from ToteTrax to Kontainer**
     - All user-facing text updated to "Kontainer"
-    - Package name: totetrax_mobile → kontainer_mobile
+    - Package name: kontainer_companion
     - Updated Android and iOS app labels
     - Documentation fully updated
   - **NEW: Search functionality**
@@ -513,5 +513,5 @@ This project uses the same technology stack and architecture as FilaTrax Mobile,
 
 ## Related Documentation
 
-- See Kontainer backend: `D:\projects\totetrax\TECHNICAL-DOCS.md`
+- See Kontainer backend: `D:\projects\kontainer\TECHNICAL-DOCS.md`
 - See FilaTrax Mobile: `D:\projects\filatrax_mobile\filatrax-mobile-info.md`

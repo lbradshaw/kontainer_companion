@@ -28,10 +28,26 @@ migrate_working_dir/
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+build/
+.idea/
+.packages
+.flutter-plugins
 .flutter-plugins-dependencies
+.melos_tool_version
+windows/flutter/ephemeral/
+android/.gradle/
+android/app/build/
+android/.idea/
+*.iml
+*.log
+*.lock
+*.tmp
+*.swp
+*.DS_Store
+.env
+secrets.*
 .pub-cache/
 .pub/
-/build/
 /coverage/
 
 # Symbolication related
