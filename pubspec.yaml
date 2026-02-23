@@ -16,7 +16,7 @@ dependencies:
   cupertino_icons: ^1.0.6
 
   # QR Code Scanning
-  mobile_scanner: ^5.0.0
+  mobile_scanner: ^7.2.0
 
   # HTTP Client for API
   http: ^1.1.0
