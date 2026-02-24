@@ -79,6 +79,10 @@ flutter build windows
 flutter build linux
 ```
 
+## Releases
+
+You can download the latest APK from the [GitHub Releases page](https://github.com/lbradshaw/kontainer_companion/releases).
+
 ### macOS
 ```bash
 flutter build macos
