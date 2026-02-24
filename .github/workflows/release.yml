@@ -18,10 +18,13 @@ jobs:
           channel: stable
       - run: flutter pub get
       - run: flutter build apk --release
+      - name: Rename APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/kontainer-companion-release.apk
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v1
         with:
           files: build/app/outputs/flutter-apk/app-release.apk
+          #files: build/app/outputs/flutter-apk/kontainer-companion-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -36,7 +39,7 @@ jobs:
       - run: flutter build windows --release
       - name: Find Windows EXE
         run: |
-          $exe = Get-ChildItem -Path build\windows\runner\Release -Filter *.exe | Select-Object -First 1
+          $exe = Get-ChildItem -Path build/windows/x64/runner/Release -Filter *.exe | Select-Object -First 1
           echo "::set-output name=exe_path::$($exe.FullName)"
         id: find_exe
       - name: Upload EXE to Release
