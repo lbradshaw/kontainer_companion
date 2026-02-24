@@ -23,8 +23,8 @@ jobs:
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/app/outputs/flutter-apk/app-release.apk
-          #files: build/app/outputs/flutter-apk/kontainer-companion-release.apk
+          #files: build/app/outputs/flutter-apk/app-release.apk
+          files: build/app/outputs/flutter-apk/kontainer-companion-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -37,14 +37,15 @@ jobs:
           channel: stable
       - run: flutter pub get
       - run: flutter build windows --release
-      - name: Find Windows EXE
-        run: |
-          $exe = Get-ChildItem -Path build/windows/x64/runner/Release -Filter *.exe | Select-Object -First 1
-          echo "::set-output name=exe_path::$($exe.FullName)"
-        id: find_exe
+      #- name: Find Windows EXE
+        #run: |
+        #  $exe = Get-ChildItem -Path build/windows/x64/runner/Release -Filter *.exe | Select-Object -First 1
+        #  echo "::set-output name=exe_path::$($exe.FullName)"
+        #id: find_exe
       - name: Upload EXE to Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{ steps.find_exe.outputs.exe_path }}
+          #files: ${{ steps.find_exe.outputs.exe_path }}
+          files: build/windows/x64/runner/Release/kontainer_companion.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
