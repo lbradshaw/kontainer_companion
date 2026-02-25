@@ -10,7 +10,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  List<String> _serverUrls = [];
+  List<Map<String, String>> _servers = [];
   int _selectedIdx = 0;
   bool _isLoading = true;
 
@@ -26,29 +26,58 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final urlsJson = prefs.getString('server_urls');
     final selectedIdx = prefs.getInt('selected_server_url_idx') ?? 0;
     if (urlsJson != null) {
-      final List<String> urls = (json.decode(urlsJson) as List<dynamic>).map((e) => e.toString()).toList();
+      final List<dynamic> raw = json.decode(urlsJson);
+      // Migration: if old format (list of strings), convert to list of maps
+      List<Map<String, String>> servers;
+      if (raw.isNotEmpty && raw.first is String) {
+        servers = raw.map((e) => {"name": "", "url": e.toString()}).toList();
+        await prefs.setString('server_urls', json.encode(servers));
+      } else {
+        servers = raw
+            .map((e) => (e is Map<String, dynamic>)
+                ? {
+                    "name": e["name"]?.toString() ?? "",
+                    "url": e["url"]?.toString() ?? ""
+                  }
+                : {"name": "", "url": e.toString()})
+            .toList();
+      }
       setState(() {
-        _serverUrls = urls;
-        _selectedIdx = (selectedIdx >= 0 && selectedIdx < urls.length) ? selectedIdx : 0;
+        _servers = servers;
+        _selectedIdx = (selectedIdx >= 0 && selectedIdx < servers.length)
+            ? selectedIdx
+            : 0;
         _isLoading = false;
       });
     } else {
       // Only migrate if both server_urls and server_url are missing
       final singleUrl = prefs.getString('server_url');
       if (singleUrl != null) {
-        await prefs.setString('server_urls', json.encode([singleUrl]));
+        await prefs.setString(
+            'server_urls',
+            json.encode([
+              {"name": "", "url": singleUrl}
+            ]));
         await prefs.setInt('selected_server_url_idx', 0);
         setState(() {
-          _serverUrls = [singleUrl];
+          _servers = [
+            {"name": "", "url": singleUrl}
+          ];
           _selectedIdx = 0;
           _isLoading = false;
         });
       } else {
         // No URLs at all, use default
-        await prefs.setString('server_urls', json.encode(['http://localhost:3818']));
+        await prefs.setString(
+            'server_urls',
+            json.encode([
+              {"name": "", "url": 'http://localhost:3818'}
+            ]));
         await prefs.setInt('selected_server_url_idx', 0);
         setState(() {
-          _serverUrls = ['http://localhost:3818'];
+          _servers = [
+            {"name": "", "url": 'http://localhost:3818'}
+          ];
           _selectedIdx = 0;
           _isLoading = false;
         });
@@ -58,7 +87,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _saveUrls() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('server_urls', json.encode(_serverUrls));
+    await prefs.setString('server_urls', json.encode(_servers));
     await prefs.setInt('selected_server_url_idx', _selectedIdx);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -68,61 +97,111 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _addUrl() async {
-    final controller = TextEditingController();
-    final result = await showDialog<String>(
+    final nameController = TextEditingController();
+    final urlController = TextEditingController();
+    final result = await showDialog<Map<String, String>>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add Server URL'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(hintText: 'http://localhost:3818'),
-          keyboardType: TextInputType.url,
+        title: const Text('Add Server'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Name (optional)'),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: urlController,
+              decoration: const InputDecoration(
+                  labelText: 'URL', hintText: 'http://localhost:3818'),
+              keyboardType: TextInputType.url,
+            ),
+          ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, controller.text), child: const Text('Add')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
+          TextButton(
+            onPressed: () {
+              if (urlController.text.trim().isNotEmpty) {
+                Navigator.pop(context, {
+                  'name': nameController.text.trim(),
+                  'url': urlController.text.trim(),
+                });
+              }
+            },
+            child: const Text('Add'),
+          ),
         ],
       ),
     );
-    if (result != null && result.trim().isNotEmpty) {
+    if (result != null && result['url']!.isNotEmpty) {
       setState(() {
-        _serverUrls.add(result.trim());
-        _selectedIdx = _serverUrls.length - 1;
+        _servers.add({'name': result['name'] ?? '', 'url': result['url']!});
+        _selectedIdx = _servers.length - 1;
       });
       await _saveUrls();
     }
   }
 
   void _editUrl(int idx) async {
-    final controller = TextEditingController(text: _serverUrls[idx]);
-    final result = await showDialog<String>(
+    final nameController =
+        TextEditingController(text: _servers[idx]['name'] ?? '');
+    final urlController =
+        TextEditingController(text: _servers[idx]['url'] ?? '');
+    final result = await showDialog<Map<String, String>>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Server URL'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(hintText: 'http://localhost:3818'),
-          keyboardType: TextInputType.url,
+        title: const Text('Edit Server'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Name (optional)'),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: urlController,
+              decoration: const InputDecoration(
+                  labelText: 'URL', hintText: 'http://localhost:3818'),
+              keyboardType: TextInputType.url,
+            ),
+          ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, controller.text), child: const Text('Save')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
+          TextButton(
+            onPressed: () {
+              if (urlController.text.trim().isNotEmpty) {
+                Navigator.pop(context, {
+                  'name': nameController.text.trim(),
+                  'url': urlController.text.trim(),
+                });
+              }
+            },
+            child: const Text('Save'),
+          ),
         ],
       ),
     );
-    if (result != null && result.trim().isNotEmpty) {
+    if (result != null && result['url']!.isNotEmpty) {
       setState(() {
-        _serverUrls[idx] = result.trim();
+        _servers[idx] = {'name': result['name'] ?? '', 'url': result['url']!};
       });
       await _saveUrls();
     }
   }
 
   void _deleteUrl(int idx) async {
-    if (_serverUrls.length == 1) return; // Don't allow deleting last URL
+    if (_servers.length == 1) return; // Don't allow deleting last URL
     setState(() {
-      _serverUrls.removeAt(idx);
-      if (_selectedIdx >= _serverUrls.length) {
+      _servers.removeAt(idx);
+      if (_selectedIdx >= _servers.length) {
         _selectedIdx = 0;
       }
     });
@@ -142,11 +221,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Expanded(
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16),
-                    itemCount: _serverUrls.length,
+                    itemCount: _servers.length,
                     itemBuilder: (context, idx) {
+                      final name = _servers[idx]['name'] ?? '';
+                      final url = _servers[idx]['url'] ?? '';
                       return Dismissible(
-                        key: ValueKey(_serverUrls[idx]),
-                        direction: _serverUrls.length == 1 ? DismissDirection.none : DismissDirection.endToStart,
+                        key: ValueKey(url),
+                        direction: _servers.length == 1
+                            ? DismissDirection.none
+                            : DismissDirection.endToStart,
                         onDismissed: (_) => _deleteUrl(idx),
                         background: Container(
                           color: Colors.red,
@@ -155,7 +238,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           child: const Icon(Icons.delete, color: Colors.white),
                         ),
                         child: ListTile(
-                          title: Text(_serverUrls[idx]),
+                          title: Text(name.isNotEmpty ? name : url),
+                          subtitle: null,
                           leading: Radio<int>(
                             value: idx,
                             groupValue: _selectedIdx,
@@ -188,7 +272,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ElevatedButton.icon(
                         onPressed: _addUrl,
                         icon: const Icon(Icons.add),
-                        label: const Text('Add Server URL'),
+                        label: const Text('Add Server'),
                       ),
                       const Spacer(),
                       ElevatedButton(

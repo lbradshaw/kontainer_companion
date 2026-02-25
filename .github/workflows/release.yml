@@ -27,6 +27,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build ipa --release --no-codesign
+      - run: mv build/ios/ipa/*.ipa build/ios/ipa/kontainer-companion.ipa
+      - name: Upload IPA to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/ios/ipa/kontainer-companion.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build-windows:
     if: false
     runs-on: windows-latest

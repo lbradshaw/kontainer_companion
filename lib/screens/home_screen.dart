@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadTotes() async {
     if (!mounted) return;
-    
+
     setState(() {
       _isLoading = true;
       _error = null;
@@ -78,7 +78,8 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () async {
               final result = await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ToteDetailScreen()),
+                MaterialPageRoute(
+                    builder: (context) => const ToteDetailScreen()),
               );
               if (result == true) {
                 _loadTotes();
@@ -124,7 +125,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppTheme.dangerColor),
+            const Icon(Icons.error_outline,
+                size: 48, color: AppTheme.dangerColor),
             const SizedBox(height: 16),
             Text('Error: $_error'),
             const SizedBox(height: 16),
@@ -176,10 +178,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       // Show sub-container count badge for parent containers
-                      if (tote.depth == 0 && tote.children != null && tote.children!.isNotEmpty)
+                      if (tote.depth == 0 &&
+                          tote.children != null &&
+                          tote.children!.isNotEmpty)
                         Container(
                           margin: const EdgeInsets.only(left: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: AppTheme.successColor,
                             borderRadius: BorderRadius.circular(12),

@@ -9,7 +9,8 @@ class ToteDetailScreen extends StatefulWidget {
   final Tote? tote;
   final int? parentId; // For creating sub-containers
 
-  const ToteDetailScreen({Key? key, this.tote, this.parentId}) : super(key: key);
+  const ToteDetailScreen({Key? key, this.tote, this.parentId})
+      : super(key: key);
 
   @override
   State<ToteDetailScreen> createState() => _ToteDetailScreenState();
@@ -22,7 +23,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
   final _itemsController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   final ApiService _apiService = ApiService();
-  
+
   List<Uint8List> _images = [];
   List<String> _imageMimeTypes = []; // Track MIME types for new images
   List<int> _imageIds = []; // Track image IDs from backend
@@ -31,7 +32,7 @@ class _ToteDetailScreenState extends State<ToteDetailScreen> {
   bool _isEditing = false;
   int _originalImageCount = 0;
   Tote? _parentTote; // Store parent info when creating sub-container
-String? _defaultSubLocation; // Store default location for sub-container
+  String? _defaultSubLocation; // Store default location for sub-container
 
   @override
   void initState() {
@@ -50,7 +51,8 @@ String? _defaultSubLocation; // Store default location for sub-container
       setState(() {
         _parentTote = parent;
         // Set default location for sub-container
-        if (parent.name.isNotEmpty && (parent.location != null && parent.location!.isNotEmpty)) {
+        if (parent.name.isNotEmpty &&
+            (parent.location != null && parent.location!.isNotEmpty)) {
           _defaultSubLocation = "${parent.name}/${parent.location}";
         } else if (parent.name.isNotEmpty) {
           _defaultSubLocation = parent.name;
@@ -75,7 +77,7 @@ String? _defaultSubLocation; // Store default location for sub-container
 
   Future<void> _loadToteData() async {
     if (widget.tote == null) return;
-    
+
     setState(() {
       _isLoading = true;
     });
@@ -83,13 +85,14 @@ String? _defaultSubLocation; // Store default location for sub-container
     try {
       // Fetch fresh data from the server
       final freshTote = await _apiService.getTote(widget.tote!.id);
-      
+
       setState(() {
         _nameController.text = freshTote.name;
         _locationController.text = freshTote.location ?? '';
         _itemsController.text = freshTote.items;
         _images = List.from(freshTote.images);
-        _imageMimeTypes = []; // Clear MIME types (existing images already in DB)
+        _imageMimeTypes =
+            []; // Clear MIME types (existing images already in DB)
         _imageIds = List.from(freshTote.imageIds);
         _originalImageCount = freshTote.images.length;
         _deletedImageIds.clear();
@@ -198,24 +201,30 @@ String? _defaultSubLocation; // Store default location for sub-container
         child: Wrap(
           children: [
             ListTile(
-              leading: const Icon(Icons.camera_alt, color: AppTheme.accentColor),
-              title: const Text('Take Photo', style: TextStyle(color: AppTheme.textColor)),
+              leading:
+                  const Icon(Icons.camera_alt, color: AppTheme.accentColor),
+              title: const Text('Take Photo',
+                  style: TextStyle(color: AppTheme.textColor)),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: AppTheme.accentColor),
-              title: const Text('Choose from Gallery', style: TextStyle(color: AppTheme.textColor)),
+              leading:
+                  const Icon(Icons.photo_library, color: AppTheme.accentColor),
+              title: const Text('Choose from Gallery',
+                  style: TextStyle(color: AppTheme.textColor)),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: AppTheme.accentColor),
-              title: const Text('Choose Multiple', style: TextStyle(color: AppTheme.textColor)),
+              leading:
+                  const Icon(Icons.photo_library, color: AppTheme.accentColor),
+              title: const Text('Choose Multiple',
+                  style: TextStyle(color: AppTheme.textColor)),
               onTap: () {
                 Navigator.pop(context);
                 _pickMultipleImages();
@@ -266,7 +275,7 @@ String? _defaultSubLocation; // Store default location for sub-container
       if (_isEditing) {
         // Track deleted count before clearing
         final deletedCount = _deletedImageIds.length;
-        
+
         // First, delete any removed images
         if (_deletedImageIds.isNotEmpty) {
           for (final imageId in _deletedImageIds) {
@@ -274,45 +283,50 @@ String? _defaultSubLocation; // Store default location for sub-container
           }
           _deletedImageIds.clear();
         }
-        
+
         // Update existing tote - only send name and items
         final toteUpdate = Tote(
           id: widget.tote!.id,
           name: _nameController.text,
-          location: _locationController.text.isEmpty ? null : _locationController.text,
+          location: _locationController.text.isEmpty
+              ? null
+              : _locationController.text,
           items: _itemsController.text,
           qrCode: widget.tote!.qrCode,
           images: [], // Don't send existing images in update
         );
         await _apiService.updateTote(toteUpdate);
-        
+
         // Add new images separately if any were added
         // _imageMimeTypes only contains MIME types for NEW images (not existing ones)
         if (_imageMimeTypes.isNotEmpty) {
           // Get only the new images (those added after loading)
           final startIndex = _originalImageCount - deletedCount;
           final newImages = _images.sublist(startIndex);
-          await _apiService.addImagesToTote(widget.tote!.id, newImages, _imageMimeTypes);
+          await _apiService.addImagesToTote(
+              widget.tote!.id, newImages, _imageMimeTypes);
         }
-        
+
         // Reload tote data to get fresh state from server
         final updatedTote = await _apiService.getTote(widget.tote!.id);
         setState(() {
           _images = updatedTote.images;
           _originalImageCount = _images.length;
         });
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Kontainer updated successfully')),
           );
         }
-      }else {
+      } else {
         // Create new tote with all images
         final tote = Tote(
           id: 0,
           name: _nameController.text,
-          location: _locationController.text.isEmpty ? null : _locationController.text,
+          location: _locationController.text.isEmpty
+              ? null
+              : _locationController.text,
           items: _itemsController.text,
           qrCode: '',
           images: _images,
@@ -355,7 +369,8 @@ String? _defaultSubLocation; // Store default location for sub-container
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.cardColor,
-        title: const Text('Delete Kontainer', style: TextStyle(color: AppTheme.textColor)),
+        title: const Text('Delete Kontainer',
+            style: TextStyle(color: AppTheme.textColor)),
         content: const Text(
           'Are you sure you want to delete this kontainer?',
           style: TextStyle(color: AppTheme.textSecondaryColor),
@@ -363,11 +378,13 @@ String? _defaultSubLocation; // Store default location for sub-container
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondaryColor)),
+            child: const Text('Cancel',
+                style: TextStyle(color: AppTheme.textSecondaryColor)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: AppTheme.dangerColor)),
+            child: const Text('Delete',
+                style: TextStyle(color: AppTheme.dangerColor)),
           ),
         ],
       ),
@@ -411,11 +428,11 @@ String? _defaultSubLocation; // Store default location for sub-container
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.cardColor,
-        title: Text(
-          _isEditing
-              ? 'Edit Kontainer'
-              : (widget.parentId != null ? 'New Sub-Container' : 'New Kontainer')
-        ),
+        title: Text(_isEditing
+            ? 'Edit Kontainer'
+            : (widget.parentId != null
+                ? 'New Sub-Container'
+                : 'New Kontainer')),
         actions: [
           if (_isEditing)
             IconButton(
@@ -425,7 +442,8 @@ String? _defaultSubLocation; // Store default location for sub-container
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.accentColor))
+          ? const Center(
+              child: CircularProgressIndicator(color: AppTheme.accentColor))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Form(
@@ -442,7 +460,8 @@ String? _defaultSubLocation; // Store default location for sub-container
                           color: const Color(0xFFE3F2FD),
                           borderRadius: BorderRadius.circular(8),
                           border: const Border(
-                            left: BorderSide(color: Color(0xFF2196F3), width: 4),
+                            left:
+                                BorderSide(color: Color(0xFF2196F3), width: 4),
                           ),
                         ),
                         child: Column(
@@ -478,21 +497,26 @@ String? _defaultSubLocation; // Store default location for sub-container
                       style: const TextStyle(color: AppTheme.textColor),
                       decoration: InputDecoration(
                         labelText: 'Kontainer Name',
-                        labelStyle: const TextStyle(color: AppTheme.accentColor),
+                        labelStyle:
+                            const TextStyle(color: AppTheme.accentColor),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: AppTheme.borderColor),
+                          borderSide:
+                              const BorderSide(color: AppTheme.borderColor),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: AppTheme.accentColor),
+                          borderSide:
+                              const BorderSide(color: AppTheme.accentColor),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         errorBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: AppTheme.dangerColor),
+                          borderSide:
+                              const BorderSide(color: AppTheme.dangerColor),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: AppTheme.dangerColor),
+                          borderSide:
+                              const BorderSide(color: AppTheme.dangerColor),
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -510,15 +534,20 @@ String? _defaultSubLocation; // Store default location for sub-container
                       decoration: InputDecoration(
                         labelText: 'Location (optional)',
                         hintText: 'e.g., Garage, Basement, Storage Unit A',
-                        hintStyle: const TextStyle(color: AppTheme.textSecondaryColor),
-                        labelStyle: const TextStyle(color: AppTheme.accentColor),
-                        prefixIcon: const Icon(Icons.location_on, color: AppTheme.accentColor),
+                        hintStyle:
+                            const TextStyle(color: AppTheme.textSecondaryColor),
+                        labelStyle:
+                            const TextStyle(color: AppTheme.accentColor),
+                        prefixIcon: const Icon(Icons.location_on,
+                            color: AppTheme.accentColor),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: AppTheme.borderColor),
+                          borderSide:
+                              const BorderSide(color: AppTheme.borderColor),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: AppTheme.accentColor),
+                          borderSide:
+                              const BorderSide(color: AppTheme.accentColor),
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -530,21 +559,26 @@ String? _defaultSubLocation; // Store default location for sub-container
                       maxLines: 5,
                       decoration: InputDecoration(
                         labelText: 'Items (one per line)',
-                        labelStyle: const TextStyle(color: AppTheme.accentColor),
+                        labelStyle:
+                            const TextStyle(color: AppTheme.accentColor),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: AppTheme.borderColor),
+                          borderSide:
+                              const BorderSide(color: AppTheme.borderColor),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: AppTheme.accentColor),
+                          borderSide:
+                              const BorderSide(color: AppTheme.accentColor),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         errorBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: AppTheme.dangerColor),
+                          borderSide:
+                              const BorderSide(color: AppTheme.dangerColor),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: AppTheme.dangerColor),
+                          borderSide:
+                              const BorderSide(color: AppTheme.dangerColor),
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -584,7 +618,8 @@ String? _defaultSubLocation; // Store default location for sub-container
                         child: const Center(
                           child: Text(
                             'No images added',
-                            style: TextStyle(color: AppTheme.textSecondaryColor),
+                            style:
+                                TextStyle(color: AppTheme.textSecondaryColor),
                           ),
                         ),
                       )
@@ -592,7 +627,8 @@ String? _defaultSubLocation; // Store default location for sub-container
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
                           crossAxisSpacing: 8,
                           mainAxisSpacing: 8,
@@ -637,24 +673,28 @@ String? _defaultSubLocation; // Store default location for sub-container
                         },
                       ),
                     const SizedBox(height: 24),
-                    
+
                     // Add Sub-Container button (only when editing a top-level container)
-                    if (_isEditing && widget.tote != null && widget.tote!.depth == 0) ...[
+                    if (_isEditing &&
+                        widget.tote != null &&
+                        widget.tote!.depth == 0) ...[
                       OutlinedButton.icon(
-                        onPressed: _isLoading ? null : () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ToteDetailScreen(
-                                parentId: widget.tote!.id,
-                              ),
-                            ),
-                          );
-                          if (result == true) {
-                            // Optionally reload to show updated children count
-                            _loadToteData();
-                          }
-                        },
+                        onPressed: _isLoading
+                            ? null
+                            : () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ToteDetailScreen(
+                                      parentId: widget.tote!.id,
+                                    ),
+                                  ),
+                                );
+                                if (result == true) {
+                                  // Optionally reload to show updated children count
+                                  _loadToteData();
+                                }
+                              },
                         icon: const Icon(Icons.add),
                         label: const Text('Add Sub-Container'),
                         style: OutlinedButton.styleFrom(
@@ -668,7 +708,7 @@ String? _defaultSubLocation; // Store default location for sub-container
                       ),
                       const SizedBox(height: 12),
                     ],
-                    
+
                     ElevatedButton(
                       onPressed: _isLoading ? null : _saveTote,
                       style: ElevatedButton.styleFrom(

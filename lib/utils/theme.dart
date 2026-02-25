@@ -22,7 +22,7 @@ class AppTheme {
   static const Color dangerColor = Color(0xFFE74C3C);
   static const Color successColor = Color(0xFF2ECC71);
   static const Color warningColor = Color(0xFFF39C12);
-  
+
   // Convenience aliases
   static const Color backgroundColor = darkBg;
   static const Color cardColor = darkCardBg;

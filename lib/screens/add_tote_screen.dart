@@ -41,7 +41,7 @@ class _AddToteScreenState extends State<AddToteScreen> {
           items: _itemsController.text,
         ),
       );
-      
+
       if (mounted) {
         Navigator.pop(context, true);
       }

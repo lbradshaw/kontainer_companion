@@ -36,7 +36,7 @@ class _ScanScreenState extends State<ScanScreen> {
 
   Future<void> _handleQRCode(String qrCode) async {
     if (_isProcessing) return;
-    
+
     setState(() {
       _isProcessing = true;
       _detectedCode = qrCode;
@@ -85,7 +85,8 @@ class _ScanScreenState extends State<ScanScreen> {
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Kontainer Not Found'),
-          content: Text('QR Code: $qrCode\n\nNo kontainer found with this QR code.'),
+          content:
+              Text('QR Code: $qrCode\n\nNo kontainer found with this QR code.'),
           actions: [
             TextButton(
               onPressed: () {
@@ -113,7 +114,7 @@ class _ScanScreenState extends State<ScanScreen> {
   @override
   Widget build(BuildContext context) {
     final scanArea = MediaQuery.of(context).size.width * 0.7;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Scan QR Code'),
@@ -140,11 +141,11 @@ class _ScanScreenState extends State<ScanScreen> {
             controller: cameraController,
             onDetect: (capture) {
               if (_isProcessing) return;
-              
+
               final List<Barcode> barcodes = capture.barcodes;
-              
+
               if (barcodes.isEmpty) return;
-              
+
               for (final barcode in barcodes) {
                 if (barcode.rawValue != null && barcode.rawValue!.isNotEmpty) {
                   _handleQRCode(barcode.rawValue!);
@@ -177,11 +178,15 @@ class _ScanScreenState extends State<ScanScreen> {
                       decoration: BoxDecoration(
                         border: Border(
                           top: BorderSide(
-                            color: _detectedCode != null ? Colors.green : Colors.blue,
+                            color: _detectedCode != null
+                                ? Colors.green
+                                : Colors.blue,
                             width: 5,
                           ),
                           left: BorderSide(
-                            color: _detectedCode != null ? Colors.green : Colors.blue,
+                            color: _detectedCode != null
+                                ? Colors.green
+                                : Colors.blue,
                             width: 5,
                           ),
                         ),
@@ -197,11 +202,15 @@ class _ScanScreenState extends State<ScanScreen> {
                       decoration: BoxDecoration(
                         border: Border(
                           top: BorderSide(
-                            color: _detectedCode != null ? Colors.green : Colors.blue,
+                            color: _detectedCode != null
+                                ? Colors.green
+                                : Colors.blue,
                             width: 5,
                           ),
                           right: BorderSide(
-                            color: _detectedCode != null ? Colors.green : Colors.blue,
+                            color: _detectedCode != null
+                                ? Colors.green
+                                : Colors.blue,
                             width: 5,
                           ),
                         ),
@@ -217,11 +226,15 @@ class _ScanScreenState extends State<ScanScreen> {
                       decoration: BoxDecoration(
                         border: Border(
                           bottom: BorderSide(
-                            color: _detectedCode != null ? Colors.green : Colors.blue,
+                            color: _detectedCode != null
+                                ? Colors.green
+                                : Colors.blue,
                             width: 5,
                           ),
                           left: BorderSide(
-                            color: _detectedCode != null ? Colors.green : Colors.blue,
+                            color: _detectedCode != null
+                                ? Colors.green
+                                : Colors.blue,
                             width: 5,
                           ),
                         ),
@@ -237,11 +250,15 @@ class _ScanScreenState extends State<ScanScreen> {
                       decoration: BoxDecoration(
                         border: Border(
                           bottom: BorderSide(
-                            color: _detectedCode != null ? Colors.green : Colors.blue,
+                            color: _detectedCode != null
+                                ? Colors.green
+                                : Colors.blue,
                             width: 5,
                           ),
                           right: BorderSide(
-                            color: _detectedCode != null ? Colors.green : Colors.blue,
+                            color: _detectedCode != null
+                                ? Colors.green
+                                : Colors.blue,
                             width: 5,
                           ),
                         ),

@@ -40,7 +40,7 @@ class Tote {
           base64Data = img['image_data'] as String;
           imageId = img['id'] as int?;
         }
-        
+
         if (base64Data != null && base64Data.isNotEmpty) {
           try {
             // Check if it's a data URI
@@ -62,7 +62,7 @@ class Tote {
         }
       }
     }
-    
+
     // Parse children if present
     List<Tote>? childrenList;
     if (json['children'] != null && json['children'] is List) {
@@ -70,7 +70,7 @@ class Tote {
           .map((child) => Tote.fromJson(child))
           .toList();
     }
-    
+
     return Tote(
       id: json['id'],
       name: json['name'],

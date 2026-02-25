@@ -94,7 +94,8 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.cardColor,
-        title: const Text('Delete Kontainer', style: TextStyle(color: AppTheme.textColor)),
+        title: const Text('Delete Kontainer',
+            style: TextStyle(color: AppTheme.textColor)),
         content: const Text(
           'Are you sure you want to delete this kontainer?',
           style: TextStyle(color: AppTheme.textSecondaryColor),
@@ -102,11 +103,13 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondaryColor)),
+            child: const Text('Cancel',
+                style: TextStyle(color: AppTheme.textSecondaryColor)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: AppTheme.dangerColor)),
+            child: const Text('Delete',
+                style: TextStyle(color: AppTheme.dangerColor)),
           ),
         ],
       ),
@@ -165,7 +168,8 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.accentColor))
+          ? const Center(
+              child: CircularProgressIndicator(color: AppTheme.accentColor))
           : RefreshIndicator(
               onRefresh: _loadToteData,
               color: AppTheme.accentColor,
@@ -176,7 +180,8 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Parent breadcrumb for sub-containers
-                    if (_currentTote.depth == 1 && _currentTote.parentId != null) ...[
+                    if (_currentTote.depth == 1 &&
+                        _currentTote.parentId != null) ...[
                       Container(
                         padding: const EdgeInsets.all(12),
                         margin: const EdgeInsets.only(bottom: 16),
@@ -188,28 +193,33 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                           onTap: () async {
                             // Always navigate to parent container, regardless of navigation stack
                             try {
-                              final parent = await _apiService.getTote(_currentTote.parentId!);
+                              final parent = await _apiService
+                                  .getTote(_currentTote.parentId!);
                               if (mounted) {
                                 // Pop current screen first, then push parent to avoid stack buildup
                                 Navigator.pop(context);
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ToteViewScreen(tote: parent),
+                                    builder: (context) =>
+                                        ToteViewScreen(tote: parent),
                                   ),
                                 );
                               }
                             } catch (e) {
                               if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Error loading parent: $e')),
+                                  SnackBar(
+                                      content:
+                                          Text('Error loading parent: $e')),
                                 );
                               }
                             }
                           },
                           child: const Row(
                             children: [
-                              Icon(Icons.arrow_back, color: Color(0xFF2196F3), size: 18),
+                              Icon(Icons.arrow_back,
+                                  color: Color(0xFF2196F3), size: 18),
                               SizedBox(width: 8),
                               Text(
                                 'Back to Parent Container',
@@ -228,7 +238,8 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                     // Sub-container indicator for depth=1
                     if (_currentTote.depth == 1) ...[
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                         margin: const EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
                           color: const Color(0xFFFF9800).withOpacity(0.1),
@@ -285,7 +296,8 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                     const SizedBox(height: 16),
 
                     // Location
-                    if (_currentTote.location != null && _currentTote.location!.isNotEmpty) ...[
+                    if (_currentTote.location != null &&
+                        _currentTote.location!.isNotEmpty) ...[
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -298,7 +310,8 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                           children: [
                             const Row(
                               children: [
-                                Icon(Icons.location_on, color: AppTheme.accentColor, size: 18),
+                                Icon(Icons.location_on,
+                                    color: AppTheme.accentColor, size: 18),
                                 SizedBox(width: 4),
                                 Text(
                                   'Location',
@@ -361,7 +374,9 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                     const SizedBox(height: 16),
 
                     // QR Code (only for top-level containers, depth=0)
-                    if (_currentTote.depth == 0 && _currentTote.qrCode != null && _currentTote.qrCode!.isNotEmpty) ...[
+                    if (_currentTote.depth == 0 &&
+                        _currentTote.qrCode != null &&
+                        _currentTote.qrCode!.isNotEmpty) ...[
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -416,7 +431,8 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                         child: const Center(
                           child: Text(
                             'No images',
-                            style: TextStyle(color: AppTheme.textSecondaryColor),
+                            style:
+                                TextStyle(color: AppTheme.textSecondaryColor),
                           ),
                         ),
                       )
@@ -424,7 +440,8 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
                           crossAxisSpacing: 8,
                           mainAxisSpacing: 8,
@@ -432,12 +449,14 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                         itemCount: _currentTote.images.length,
                         itemBuilder: (context, index) {
                           return GestureDetector(
-                            onTap: () => _showFullImage(_currentTote.images[index]),
+                            onTap: () =>
+                                _showFullImage(_currentTote.images[index]),
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
                                 image: DecorationImage(
-                                  image: MemoryImage(_currentTote.images[index]),
+                                  image:
+                                      MemoryImage(_currentTote.images[index]),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -445,9 +464,11 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                           );
                         },
                       ),
-                    
+
                     // Sub-Containers Section (only for top-level containers) - Text list below images
-                    if (_currentTote.depth == 0 && _currentTote.children != null && _currentTote.children!.isNotEmpty) ...[
+                    if (_currentTote.depth == 0 &&
+                        _currentTote.children != null &&
+                        _currentTote.children!.isNotEmpty) ...[
                       const SizedBox(height: 24),
                       const Text(
                         'Sub-Containers',
@@ -476,7 +497,8 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: _currentTote.children!.length,
-                          separatorBuilder: (context, index) => const Divider(height: 1),
+                          separatorBuilder: (context, index) =>
+                              const Divider(height: 1),
                           itemBuilder: (context, index) {
                             final child = _currentTote.children![index];
                             return ListTile(
@@ -499,12 +521,14 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                                   fontFamily: 'monospace',
                                 ),
                               ),
-                              trailing: const Icon(Icons.chevron_right, color: AppTheme.textSecondaryColor),
+                              trailing: const Icon(Icons.chevron_right,
+                                  color: AppTheme.textSecondaryColor),
                               onTap: () async {
                                 final result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ToteViewScreen(tote: child),
+                                    builder: (context) =>
+                                        ToteViewScreen(tote: child),
                                   ),
                                 );
                                 if (result == true) {
@@ -521,19 +545,21 @@ class _ToteViewScreenState extends State<ToteViewScreen> {
                     if (_currentTote.depth == 0) ...[
                       const SizedBox(height: 16),
                       ElevatedButton.icon(
-                        onPressed: _isLoading ? null : () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ToteDetailScreen(
-                                parentId: _currentTote.id,
-                              ),
-                            ),
-                          );
-                          if (result == true) {
-                            _loadToteData();
-                          }
-                        },
+                        onPressed: _isLoading
+                            ? null
+                            : () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ToteDetailScreen(
+                                      parentId: _currentTote.id,
+                                    ),
+                                  ),
+                                );
+                                if (result == true) {
+                                  _loadToteData();
+                                }
+                              },
                         icon: const Icon(Icons.add),
                         label: const Text('Add Sub-Container'),
                         style: ElevatedButton.styleFrom(

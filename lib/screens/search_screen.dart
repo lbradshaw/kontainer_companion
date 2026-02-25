@@ -13,7 +13,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final ApiService _apiService = ApiService();
   final TextEditingController _searchController = TextEditingController();
-  
+
   List<Tote> _searchResults = [];
   bool _isLoading = false;
   bool _hasSearched = false;
@@ -37,11 +37,12 @@ class _SearchScreenState extends State<SearchScreen> {
       // Get ALL kontainers including sub-containers for search
       final allTotes = await _apiService.getTotesAll();
       final queryLower = query.toLowerCase();
-      
+
       final results = allTotes.where((tote) {
         final nameLower = tote.name.toLowerCase();
         final itemsLower = tote.items.toLowerCase();
-        return nameLower.contains(queryLower) || itemsLower.contains(queryLower);
+        return nameLower.contains(queryLower) ||
+            itemsLower.contains(queryLower);
       }).toList();
 
       setState(() {
@@ -107,7 +108,8 @@ class _SearchScreenState extends State<SearchScreen> {
                 ElevatedButton(
                   onPressed: _isLoading ? null : _performSearch,
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 16),
                   ),
                   child: _isLoading
                       ? const SizedBox(
@@ -121,7 +123,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
           const Divider(height: 1),
-          
+
           // Search results
           Expanded(
             child: _buildResultsSection(),
@@ -201,7 +203,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       if (tote.depth == 1)
                         Container(
                           margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: const Color(0xFFFF9800),
                             borderRadius: BorderRadius.circular(4),
