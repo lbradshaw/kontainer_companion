@@ -9,6 +9,16 @@ class ApiService {
 
   Future<String> _getBaseUrl() async {
     final prefs = await SharedPreferences.getInstance();
+    // Multi-URL support: get list and selected index
+    final urlsJson = prefs.getString('server_urls');
+    final selectedIdx = prefs.getInt('selected_server_url_idx') ?? 0;
+    if (urlsJson != null) {
+      final List urls = json.decode(urlsJson);
+      if (urls.isNotEmpty && selectedIdx >= 0 && selectedIdx < urls.length) {
+        return urls[selectedIdx];
+      }
+    }
+    // Fallback to old single URL
     return prefs.getString('server_url') ?? 'http://localhost:3818';
   }
 
